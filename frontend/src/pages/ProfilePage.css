@@ -1,0 +1,20 @@
+/* src/pages/ProfilePage.css */
+.profile-page { padding: 28px 0 60px; }
+.profile-title { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 24px; }
+.profile-layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+
+.profile-avatar-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px 24px; text-align: center; }
+.avatar-wrapper { position: relative; display: inline-block; margin-bottom: 16px; }
+.profile-avatar-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
+.avatar-placeholder { width: 120px; height: 120px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: var(--primary); border: 3px solid var(--primary); }
+.change-avatar-btn { position: absolute; bottom: 4px; right: 4px; background: var(--primary); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.avatar-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.avatar-email { font-size: 13px; color: var(--text-light); margin-bottom: 12px; }
+.user-role-badge { display: inline-block; background: var(--primary-light); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+
+.profile-form-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; }
+.profile-form-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+
+@media (max-width: 768px) {
+  .profile-layout { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,35 @@
+/* src/components/Footer.css */
+.footer { background: #1a1a2e; color: rgba(255,255,255,0.75); margin-top: 60px; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 40px; padding: 48px 0 32px; }
+
+.footer-logo { font-family: 'Playfair Display', serif; font-size: 26px; color: white; margin-bottom: 12px; }
+.footer-logo span { color: #ffd700; }
+.footer-brand p { font-size: 13px; line-height: 1.7; margin-bottom: 16px; }
+.footer-socials { display: flex; gap: 12px; }
+.footer-socials a {
+  width: 36px; height: 36px; background: rgba(255,255,255,0.1);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: white; transition: background 0.2s;
+}
+.footer-socials a:hover { background: var(--primary); }
+
+.footer-links h4 { color: white; font-size: 15px; margin-bottom: 14px; }
+.footer-links a { display: block; font-size: 13px; margin-bottom: 8px; transition: color 0.2s; }
+.footer-links a:hover { color: white; }
+
+.footer-contact h4 { color: white; font-size: 15px; margin-bottom: 14px; }
+.footer-contact p { font-size: 13px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+
+.payment-icons { display: flex; flex-wrap: wrap; gap: 8px; }
+.payment-icons span {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; color: white;
+}
+
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding: 16px 0; text-align: center; font-size: 13px; }
+
+@media (max-width: 768px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; padding: 32px 0 24px; }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-contact { grid-column: 1 / -1; }
+}

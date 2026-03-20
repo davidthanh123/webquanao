@@ -1,0 +1,32 @@
+/* src/pages/OrdersPage.css */
+.orders-page { padding: 28px 0 60px; }
+.orders-title { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 24px; }
+.orders-list { display: flex; flex-direction: column; gap: 16px; }
+
+.order-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.order-header { display: flex; align-items: center; gap: 16px; padding: 16px 20px; cursor: pointer; transition: background 0.15s; }
+.order-header:hover { background: var(--bg); }
+.order-id-block { flex: 1; }
+.order-id { font-weight: 700; font-size: 15px; display: block; font-family: monospace; }
+.order-date { font-size: 12px; color: var(--text-light); }
+.order-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.order-total { font-weight: 700; font-size: 15px; color: var(--primary); min-width: 110px; text-align: right; }
+.expand-btn { background: none; border: none; cursor: pointer; color: var(--text-light); padding: 4px; }
+
+.order-details { padding: 0 20px 20px; border-top: 1px solid var(--border); }
+.order-items-list { display: flex; flex-direction: column; gap: 10px; padding: 16px 0; }
+.order-item { display: flex; align-items: center; gap: 12px; }
+.order-item img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+.item-name { font-size: 14px; font-weight: 600; }
+.item-variant { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+.item-price { font-size: 14px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+
+.order-info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; padding: 16px 0; border-top: 1px solid var(--border); }
+.order-info-grid h4 { font-size: 13px; font-weight: 700; color: var(--text-light); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.order-info-grid p { font-size: 13px; line-height: 1.6; }
+.order-pricing .summary-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+
+@media (max-width: 768px) {
+  .order-header { flex-wrap: wrap; gap: 10px; }
+  .order-info-grid { grid-template-columns: 1fr; }
+}

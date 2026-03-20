@@ -1,0 +1,119 @@
+/* src/App.css */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+
+:root {
+  --primary: #ee4d2d;
+  --primary-dark: #d73211;
+  --primary-light: #fff0ed;
+  --secondary: #f5a623;
+  --text: #222222;
+  --text-light: #777;
+  --border: #e8e8e8;
+  --bg: #f5f5f5;
+  --white: #ffffff;
+  --success: #2ebb77;
+  --radius: 8px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-hover: 0 6px 24px rgba(0,0,0,0.14);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; }
+img { max-width: 100%; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+
+/* Buttons */
+.btn-primary {
+  background: var(--primary); color: white; border: none;
+  padding: 10px 24px; border-radius: var(--radius); font-weight: 700;
+  font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+.btn-outline {
+  background: white; color: var(--primary); border: 1.5px solid var(--primary);
+  padding: 9px 24px; border-radius: var(--radius); font-weight: 700; font-size: 14px;
+  transition: all 0.2s;
+}
+.btn-outline:hover { background: var(--primary-light); }
+
+.btn-ghost {
+  background: transparent; border: none; color: var(--text-light);
+  padding: 8px 12px; border-radius: var(--radius); font-size: 14px; transition: all 0.2s;
+}
+.btn-ghost:hover { background: var(--bg); color: var(--text); }
+
+/* Cards */
+.card {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden; transition: box-shadow 0.2s, transform 0.2s;
+}
+.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+
+/* Badge */
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+}
+.badge-red { background: var(--primary); color: white; }
+.badge-orange { background: var(--secondary); color: white; }
+.badge-green { background: var(--success); color: white; }
+
+/* Star Rating */
+.stars { color: #f5a623; font-size: 13px; }
+
+/* Price */
+.price-current { color: var(--primary); font-weight: 800; font-size: 16px; }
+.price-original { color: var(--text-light); text-decoration: line-through; font-size: 13px; }
+.price-discount { color: var(--primary); font-size: 12px; font-weight: 700; }
+
+/* Forms */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+.form-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius); font-size: 14px; font-family: inherit;
+  transition: border-color 0.2s; outline: none;
+}
+.form-input:focus { border-color: var(--primary); }
+
+/* Grid */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+
+/* Divider */
+.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* Pagination */
+.pagination { display: flex; gap: 8px; justify-content: center; margin: 32px 0; }
+.page-btn {
+  width: 36px; height: 36px; border: 1.5px solid var(--border);
+  border-radius: 6px; background: white; font-weight: 600; font-size: 14px;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+}
+.page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.page-btn:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+/* Loading */
+.spinner {
+  width: 40px; height: 40px; border: 4px solid var(--border);
+  border-top-color: var(--primary); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 40px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toast override */
+.hot-toast-success { background: #2ebb77 !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .container { padding: 0 12px; }
+}
