@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from 'axios';
 
-const API = axios.create({ baseURL: '/api' });
+const API = axios.create({ baseURL: 'https://webquanao-production.up.railway.app/api' });
 
 // Tự động gắn token vào header
 API.interceptors.request.use(config => {
