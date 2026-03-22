@@ -20,7 +20,7 @@ router.put('/profile', authMiddleware, (req, res) => {
 router.post('/address', authMiddleware, (req, res) => {
   const user = db.users.find(u => u.id === req.user.id);
   const { name, phone, address, isDefault } = req.body;
-  const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
   if (isDefault) user.address.forEach(a => a.isDefault = false);
   user.address.push({ id: uuidv4(), name, phone, address, isDefault: isDefault || false });
   res.json({ message: 'Đã thêm địa chỉ', addresses: user.address });
