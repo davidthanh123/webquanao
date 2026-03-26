@@ -107,20 +107,48 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Categories bar */}
-      <div className="navbar-cats">
-        <div className="container navbar-cats-inner">
-          <Link to="/products">Tất cả</Link>
-          <Link to="/products?category=ao-nam">Áo Nam</Link>
-          <Link to="/products?category=quan-nam">Quần Nam</Link>
-          <Link to="/products?category=ao-nu">Áo Nữ</Link>
-          <Link to="/products?category=quan-nu">Quần Nữ</Link>
-          <Link to="/products?category=vay-dam">Váy Đầm</Link>
-          <Link to="/products?category=phu-kien">Phụ Kiện</Link>
-          <Link to="/products?tag=sale" style={{ color: '#ee4d2d', fontWeight: 700 }}>🔥 Flash Sale</Link>
-        </div>
-      </div>
+      {/* Categories bar - Desktop */}
+<div className="navbar-cats">
+  <div className="container navbar-cats-inner">
+    <Link to="/products">Tất cả</Link>
+    <Link to="/products?category=ao-nam">Áo Nam</Link>
+    <Link to="/products?category=quan-nam">Quần Nam</Link>
+    <Link to="/products?category=ao-nu">Áo Nữ</Link>
+    <Link to="/products?category=quan-nu">Quần Nữ</Link>
+    <Link to="/products?category=vay-dam">Váy Đầm</Link>
+    <Link to="/products?category=phu-kien">Phụ Kiện</Link>
+    <Link to="/products?tag=sale" style={{ color: '#ffd700', fontWeight: 700 }}>🔥 Flash Sale</Link>
+  </div>
+</div>
 
+{/* Categories dropdown - Mobile (hiện khi bấm nút ☰) */}
+{menuOpen && (
+  <div className="mobile-menu">
+    <div className="mobile-cats-label">Danh mục</div>
+    <Link to="/products" onClick={() => setMenuOpen(false)}>🛍️ Tất cả sản phẩm</Link>
+    <Link to="/products?category=ao-nam" onClick={() => setMenuOpen(false)}>👕 Áo Nam</Link>
+    <Link to="/products?category=quan-nam" onClick={() => setMenuOpen(false)}>👖 Quần Nam</Link>
+    <Link to="/products?category=ao-nu" onClick={() => setMenuOpen(false)}>👗 Áo Nữ</Link>
+    <Link to="/products?category=quan-nu" onClick={() => setMenuOpen(false)}>👖 Quần Nữ</Link>
+    <Link to="/products?category=vay-dam" onClick={() => setMenuOpen(false)}>👗 Váy Đầm</Link>
+    <Link to="/products?category=phu-kien" onClick={() => setMenuOpen(false)}>👜 Phụ Kiện</Link>
+    <Link to="/products?tag=sale" onClick={() => setMenuOpen(false)}>🔥 Flash Sale</Link>
+    <hr style={{ border: '1px solid #eee', margin: 0 }} />
+    <Link to="/cart" onClick={() => setMenuOpen(false)}>🛒 Giỏ hàng ({cartCount})</Link>
+    {user ? (
+      <>
+        <Link to="/profile" onClick={() => setMenuOpen(false)}>👤 Tài khoản</Link>
+        <Link to="/orders" onClick={() => setMenuOpen(false)}>📦 Đơn hàng</Link>
+        <button onClick={() => { handleLogout(); setMenuOpen(false); }}>🚪 Đăng xuất</button>
+      </>
+    ) : (
+      <>
+        <Link to="/login" onClick={() => setMenuOpen(false)}>🔑 Đăng nhập</Link>
+        <Link to="/register" onClick={() => setMenuOpen(false)}>📝 Đăng ký</Link>
+      </>
+    )}
+  </div>
+)}
       {/* Mobile menu */}
       {menuOpen && (
         <div className="mobile-menu">
