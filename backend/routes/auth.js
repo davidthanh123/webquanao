@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { randomUUID: uuidv4 } = require('crypto');
 const db = require('../db');
 const { JWT_SECRET, authMiddleware } = require('../middleware/auth');
+const passport = require('../middleware/passport');
 
 const router = express.Router();
 
@@ -13,7 +14,6 @@ router.post('/register', async (req, res) => {
   const { name, email, password, phone } = req.body;
   if (!name || !email || !password) return res.status(400).json({ message: 'Vui lòng điền đầy đủ thông tin' });
   if (db.users.find(u => u.email === email)) return res.status(400).json({ message: 'Email đã tồn tại' });
-
   const hashedPassword = await bcrypt.hash(password, 10);
   const newUser = {
     id: uuidv4(),
@@ -35,10 +35,8 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = db.users.find(u => u.email === email);
   if (!user) return res.status(400).json({ message: 'Email hoặc mật khẩu không đúng' });
-
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(400).json({ message: 'Email hoặc mật khẩu không đúng' });
-
   const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
   const { password: _, ...userWithoutPassword } = user;
   res.json({ message: 'Đăng nhập thành công!', token, user: userWithoutPassword });
@@ -51,10 +49,6 @@ router.get('/me', authMiddleware, (req, res) => {
   const { password: _, ...userWithoutPassword } = user;
   res.json(userWithoutPassword);
 });
-
-
-const passport = require('../middleware/passport');
-const jwt = require('jsonwebtoken'); // đã có sẵn
 
 // Google OAuth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -75,6 +69,5 @@ router.get('/facebook/callback',
     res.redirect(`https://webquanao-seven.vercel.app/oauth-callback?token=${token}`);
   }
 );
-
 
 module.exports = router;
