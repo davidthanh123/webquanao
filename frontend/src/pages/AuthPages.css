@@ -12,3 +12,14 @@
 .auth-demo p { font-size: 13px; color: var(--text-light); margin-bottom: 8px; }
 .demo-btn { margin: 0 4px; padding: 5px 14px; background: white; border: 1.5px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer; transition: all 0.15s; }
 .demo-btn:hover { border-color: var(--primary); color: var(--primary); }
+.auth-social { text-align: center; margin: 16px 0; }
+.auth-social p { color: #888; margin-bottom: 12px; font-size: 14px; }
+.btn-google, .btn-facebook {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; width: 100%; padding: 12px;
+  border-radius: 8px; font-weight: 600; font-size: 15px;
+  text-decoration: none; margin-bottom: 10px; transition: opacity 0.2s;
+}
+.btn-google { background: #fff; border: 1.5px solid #ddd; color: #333; }
+.btn-facebook { background: #1877f2; color: #fff; border: none; }
+.btn-google:hover, .btn-facebook:hover { opacity: 0.85; }

@@ -52,4 +52,29 @@ router.get('/me', authMiddleware, (req, res) => {
   res.json(userWithoutPassword);
 });
 
+
+const passport = require('../middleware/passport');
+const jwt = require('jsonwebtoken'); // đã có sẵn
+
+// Google OAuth
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: 'https://webquanao-seven.vercel.app/login?error=1' }),
+  (req, res) => {
+    const token = jwt.sign({ id: req.user.id, email: req.user.email, role: req.user.role }, JWT_SECRET, { expiresIn: '7d' });
+    res.redirect(`https://webquanao-seven.vercel.app/oauth-callback?token=${token}`);
+  }
+);
+
+// Facebook OAuth
+router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+router.get('/facebook/callback',
+  passport.authenticate('facebook', { session: false, failureRedirect: 'https://webquanao-seven.vercel.app/login?error=1' }),
+  (req, res) => {
+    const token = jwt.sign({ id: req.user.id, email: req.user.email, role: req.user.role }, JWT_SECRET, { expiresIn: '7d' });
+    res.redirect(`https://webquanao-seven.vercel.app/oauth-callback?token=${token}`);
+  }
+);
+
+
 module.exports = router;

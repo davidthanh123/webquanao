@@ -17,6 +17,7 @@ import OrdersPage from './pages/OrdersPage';
 import AdminPage from './pages/AdminPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
+import OAuthCallback from './pages/OAuthCallback';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+              <Route path="/oauth-callback" element={<OAuthCallback />} />
             </Routes>
           </main>
           <Footer />

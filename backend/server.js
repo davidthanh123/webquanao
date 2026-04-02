@@ -12,6 +12,7 @@ const bannerRoutes = require('./routes/banners');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+
 // Middleware
 app.use(cors({
   origin: [
@@ -22,6 +23,14 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+const session = require('express-session');
+const passport = require('./middleware/passport');
+
+app.use(session({ secret: process.env.SESSION_SECRET || 'fashionstore_secret', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 // 📷 Serve static images - đặt tất cả ảnh vào thư mục /backend/public/images/
 app.use('/images', express.static(path.join(__dirname, 'public/images')));

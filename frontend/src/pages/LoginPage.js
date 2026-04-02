@@ -48,10 +48,16 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="auth-demo">
-          <p>Tài khoản demo:</p>
-          <button onClick={() => setForm({ email: 'user@example.com', password: 'user123' })} className="demo-btn">👤 User</button>
-          <button onClick={() => setForm({ email: 'admin@fashionstore.com', password: 'admin123' })} className="demo-btn">👑 Admin</button>
+        <div className="auth-social">
+          <p>Hoặc đăng nhập với</p>
+          <a href="https://webquanao-production.up.railway.app/api/auth/google" className="btn-google">
+            <img src="https://www.google.com/favicon.ico" alt="Google" width={20} />
+            Tiếp tục với Google
+          </a>
+          <a href="https://webquanao-production.up.railway.app/api/auth/facebook" className="btn-facebook">
+            <img src="https://www.facebook.com/favicon.ico" alt="Facebook" width={20} />
+            Tiếp tục với Facebook
+          </a>
         </div>
 
         <p className="auth-switch">Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link></p>
