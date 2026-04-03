@@ -50,11 +50,11 @@ export default function LoginPage() {
 
         <div className="auth-social">
           <p>Hoặc đăng nhập với</p>
-          <a href="https://webquanao-production.up.railway.app/api/auth/google" className="btn-google">
+          <a href="/api/auth/google" className="btn-google">
             <img src="https://www.google.com/favicon.ico" alt="Google" width={20} />
             Tiếp tục với Google
           </a>
-          <a href="https://webquanao-production.up.railway.app/api/auth/facebook" className="btn-facebook">
+          <a href="/api/auth/facebook" className="btn-facebook">
             <img src="https://www.facebook.com/favicon.ico" alt="Facebook" width={20} />
             Tiếp tục với Facebook
           </a>
