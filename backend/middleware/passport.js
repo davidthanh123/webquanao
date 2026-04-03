@@ -4,19 +4,25 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const { randomUUID } = require('crypto');
 const db = require('../db');
 
-// Lazy load để đảm bảo env vars đã được load
 const initPassport = () => {
-  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '453664751954-j46qjhlmjfmko0fpkfhesibtt2tvefmq.apps.googleusercontent.com';
-  const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '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';
-  const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID || '1571755013915070';
-  const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET || '0dc0c613ddcba0ce03afceeb74ecb4a2';
+  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+  const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+  const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+
+  // Kiểm tra bắt buộc
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    throw new Error('Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET');
+  }
+  if (!FACEBOOK_APP_ID || !FACEBOOK_APP_SECRET) {
+    throw new Error('Missing FACEBOOK_APP_ID or FACEBOOK_APP_SECRET');
+  }
 
   passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
     callbackURL: '/api/auth/google/callback'
   }, async (accessToken, refreshToken, profile, done) => {
-    // ... phần còn lại giữ nguyên
     let user = db.users.find(u => u.email === profile.emails[0].value);
     if (!user) {
       user = {
@@ -35,8 +41,8 @@ const initPassport = () => {
   }));
 
   passport.use(new FacebookStrategy({
-    clientID: process.env.FACEBOOK_APP_ID,
-    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    clientID: FACEBOOK_APP_ID,
+    clientSecret: FACEBOOK_APP_SECRET,
     callbackURL: '/api/auth/facebook/callback',
     profileFields: ['id', 'displayName', 'photos', 'email']
   }, async (accessToken, refreshToken, profile, done) => {
