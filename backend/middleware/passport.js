@@ -21,7 +21,7 @@ const initPassport = () => {
   passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: '/api/auth/google/callback'
+    callbackURL: 'https://webquanao-production.up.railway.app/api/auth/google/callback'
   }, async (accessToken, refreshToken, profile, done) => {
     let user = db.users.find(u => u.email === profile.emails[0].value);
     if (!user) {
@@ -43,7 +43,7 @@ const initPassport = () => {
   passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: '/api/auth/facebook/callback',
+    callbackURL: 'https://webquanao-production.up.railway.app/api/auth/facebook/callback',
     profileFields: ['id', 'displayName', 'photos', 'email']
   }, async (accessToken, refreshToken, profile, done) => {
     const email = profile.emails?.[0]?.value || `fb_${profile.id}@facebook.com`;
