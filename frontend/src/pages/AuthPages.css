@@ -4,7 +4,7 @@
 /* ===== LAYOUT ===== */
 .lx-wrap {
   min-height: calc(100vh - 80px);
-  background: #0a0a0a;
+  background: #2a2520;
   display: flex;
   align-items: stretch;
   font-family: 'Jost', sans-serif;
@@ -13,7 +13,7 @@
 /* ===== LEFT PANEL ===== */
 .lx-left {
   flex: 1;
-  background: linear-gradient(160deg, #111 0%, #1a1208 50%, #0d0d0d 100%);
+  background: linear-gradient(160deg, #2a2520 0%, #332c22 50%, #252018 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -84,7 +84,7 @@
 /* ===== RIGHT PANEL ===== */
 .lx-right {
   width: 480px;
-  background: #111111;
+  background: #1e1b17;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,8 +156,8 @@
 
 .lx-input {
   width: 100%;
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
+  background: #2a2520;        /* ← đổi từ #1a1a1a */
+  border: 1px solid #3a3028;  /* ← đổi từ #2a2a2a */
   border-radius: 2px;
   padding: 14px 16px;
   font-family: 'Jost', sans-serif;
@@ -173,7 +173,7 @@
 
 .lx-input:focus {
   border-color: #b49c64;
-  background: #1e1e1e;
+  background: #2e2820;
 }
 
 /* Eye toggle button */
@@ -263,8 +263,8 @@
   justify-content: center;
   gap: 10px;
   padding: 13px 16px;
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
+  background: #2a2520;        /* ← đổi từ #1a1a1a */
+  border: 1px solid #3a3028;  /* ← đổi từ #2a2a2a */
   border-radius: 2px;
   font-family: 'Jost', sans-serif;
   font-size: 13px;
