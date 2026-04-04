@@ -6,9 +6,29 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import './AuthPages.css';
 
+function EyeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  );
+}
+
 export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { loginUser } = useAuth();
   const navigate = useNavigate();
 
@@ -27,7 +47,6 @@ export default function LoginPage() {
 
   return (
     <div className="lx-wrap">
-      {/* LEFT PANEL */}
       <div className="lx-left">
         <div className="lx-brand">
           <p className="lx-brand-name">Fashion<br />Store</p>
@@ -39,7 +58,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
       <div className="lx-right">
         <div className="lx-form-wrap">
           <div className="lx-ornament">
@@ -65,18 +83,26 @@ export default function LoginPage() {
             </div>
             <div className="lx-field">
               <label className="lx-label">Mật khẩu</label>
-              <input
-                className="lx-input"
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                required
-              />
+              <div className="lx-input-wrap">
+                <input
+                  className="lx-input"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                  required
+                />
+                <button
+                  type="button"
+                  className="lx-eye-btn"
+                  onClick={() => setShowPassword(v => !v)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </button>
+              </div>
             </div>
-            <div className="lx-forgot">
-              <a href="#">Quên mật khẩu?</a>
-            </div>
+            <div className="lx-forgot"><a href="#">Quên mật khẩu?</a></div>
             <button type="submit" className="lx-btn-primary" disabled={loading}>
               {loading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
             </button>
@@ -89,10 +115,7 @@ export default function LoginPage() {
           </div>
 
           <div className="lx-social-row">
-            <a
-              href="https://webquanao-production.up.railway.app/api/auth/google"
-              className="lx-btn-social lx-btn-google"
-            >
+            <a href="https://webquanao-production.up.railway.app/api/auth/google" className="lx-btn-social lx-btn-google">
               <svg width="16" height="16" viewBox="0 0 24 24">
                 <path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.27 0 3.198 2.698 1.24 6.65l4.026 3.115z"/>
                 <path fill="#34A853" d="M16.04 18.013c-1.09.703-2.474 1.078-4.04 1.078a7.077 7.077 0 0 1-6.723-4.823l-4.04 3.067A11.965 11.965 0 0 0 12 24c2.933 0 5.735-1.043 7.834-3l-3.793-2.987z"/>
@@ -101,10 +124,7 @@ export default function LoginPage() {
               </svg>
               Google
             </a>
-            <a
-              href="https://webquanao-production.up.railway.app/api/auth/facebook"
-              className="lx-btn-social lx-btn-facebook"
-            >
+            <a href="https://webquanao-production.up.railway.app/api/auth/facebook" className="lx-btn-social lx-btn-facebook">
               <svg width="16" height="16" viewBox="0 0 24 24">
                 <path fill="#1877F2" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
               </svg>
@@ -112,9 +132,7 @@ export default function LoginPage() {
             </a>
           </div>
 
-          <p className="lx-switch">
-            Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
-          </p>
+          <p className="lx-switch">Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link></p>
         </div>
       </div>
     </div>

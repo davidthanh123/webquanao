@@ -143,6 +143,17 @@
   margin-bottom: 8px;
 }
 
+/* Input wrapper for eye button */
+.lx-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lx-input-wrap .lx-input {
+  padding-right: 44px;
+}
+
 .lx-input {
   width: 100%;
   background: #1a1a1a;
@@ -164,6 +175,23 @@
   border-color: #b49c64;
   background: #1e1e1e;
 }
+
+/* Eye toggle button */
+.lx-eye-btn {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.lx-eye-btn:hover { color: #b49c64; }
 
 .lx-forgot {
   text-align: right;
