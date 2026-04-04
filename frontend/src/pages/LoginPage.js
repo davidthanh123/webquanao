@@ -54,7 +54,7 @@ export default function LoginPage() {
             <img src="https://www.google.com/favicon.ico" alt="Google" width={20} />
             Tiếp tục với Google
           </a>
-          // ✅ ĐÚNG
+
 <a href="https://webquanao-production.up.railway.app/api/auth/facebook" className="btn-facebook">
             <img src="https://www.facebook.com/favicon.ico" alt="Facebook" width={20} />
             Tiếp tục với Facebook
