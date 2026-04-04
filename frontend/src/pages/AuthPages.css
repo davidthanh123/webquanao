@@ -202,6 +202,7 @@
 .lx-btn-primary:hover { background: #c8b07a; }
 .lx-btn-primary:active { transform: scale(0.99); }
 .lx-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.lx-btn-primary--top { margin-top: 8px; }
 
 /* ===== DIVIDER ===== */
 .lx-divider {
