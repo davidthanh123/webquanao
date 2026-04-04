@@ -61,7 +61,7 @@ router.get('/google/callback',
 );
 
 // Facebook OAuth
-router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+router.get('/facebook', passport.authenticate('facebook', { scope: ['public_profile', 'email'] }));
 router.get('/facebook/callback',
   passport.authenticate('facebook', { session: false, failureRedirect: 'https://webquanao-seven.vercel.app/login?error=1' }),
   (req, res) => {
