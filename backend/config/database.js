@@ -2,17 +2,20 @@ const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
 const sequelize = new Sequelize(
-  // Railway sẽ tự cung cấp các biến này, không cần file .env trên server
-  process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || 'railway',
-  process.env.MYSQL_USER || process.env.MYSQLUSER || 'root',
-  process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD,
+  process.env.MYSQL_DATABASE || 'railway',
+  process.env.MYSQL_USER || 'root',
+  process.env.MYSQL_PASSWORD || 'YtHgUOpEgPnMLRYAjUUUQAzCPOAWLfBY',
   {
-    host: process.env.MYSQL_HOST || process.env.MYSQLHOST || 'localhost',
-    port: process.env.MYSQL_PORT || process.env.MYSQLPORT || 3306,
+    // Nếu có biến môi trường MYSQL_HOST (do bạn đặt trong .env hoặc Railway tự có) thì dùng, 
+    // nếu không thì mặc định dùng cái host Public để bạn Seed tại máy.
+    host: process.env.MYSQL_HOST || 'interchange.proxy.rlwy.net',
+    
+    // Tương tự cho Port
+    port: process.env.MYSQL_PORT || 27854,
+    
     dialect: 'mysql',
     logging: false,
   }
 );
 
-// DÒNG NÀY LÀ BẮT BUỘC:
 module.exports = sequelize;
