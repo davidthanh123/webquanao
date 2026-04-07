@@ -172,7 +172,7 @@ const db = {
     {
       id: 'b1',
       image: '/images/banners/banner1.jpg',  // 📷 BANNER 1: Ảnh banner trang chủ (1200x400px)
-      title: 'Bộ Sưu Tập Hè 2025',
+      title: 'Bộ Sưu Tập Hè 2026',
       subtitle: 'Giảm đến 50% toàn bộ sản phẩm',
       link: '/products'
     },

@@ -10,6 +10,25 @@ const cartRoutes = require('./routes/cart');
 const userRoutes = require('./routes/users');
 const bannerRoutes = require('./routes/banners');
 
+// ============ DATABASE + MODELS ============
+const sequelize = require('./config/database');
+const Product     = require('./models/Product');
+const Category    = require('./models/Category');
+const Review      = require('./models/Review');
+const User        = require('./models/User');
+const UserAddress = require('./models/UserAddress');
+
+// Quan hệ giữa các bảng
+Product.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
+Review.belongsTo(User,      { foreignKey: 'userId',     as: 'user' });
+User.hasMany(UserAddress,   { foreignKey: 'userId',     as: 'addresses' });
+
+// Kết nối MySQL
+sequelize.authenticate()
+  .then(() => console.log('✅ Kết nối MySQL thành công!'))
+  .catch(err => console.error('❌ Lỗi kết nối MySQL:', err));
+// ==========================================
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 

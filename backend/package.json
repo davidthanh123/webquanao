@@ -11,6 +11,7 @@
     "express-session": "^1.19.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.294.0",
+    "mysql2": "^3.20.0",
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
@@ -19,6 +20,7 @@
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.20.0",
     "react-scripts": "5.0.1",
+    "sequelize": "^6.37.8",
     "swiper": "^11.0.5"
   },
   "scripts": {
@@ -37,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.5"
   }
 }
