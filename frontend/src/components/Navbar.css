@@ -297,3 +297,94 @@
   letter-spacing: 1px;
   background: var(--bg);
 }
+/* ── Thêm vào cuối Navbar.css ─────────────────────────────────────────────── */
+
+/* Nav link thường */
+.nav-cat-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4px 0;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.nav-cat-link:hover { opacity: 0.8; }
+
+/* Flash Sale */
+.nav-sale {
+  color: #ffd700 !important;
+  font-weight: 700 !important;
+}
+
+/* ── Dropdown wrapper ────────────────────────────────────────────────────── */
+.nav-dropdown-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Trigger text (hover để mở dropdown) */
+.nav-cat-trigger {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  user-select: none;
+}
+.nav-cat-trigger:hover { opacity: 0.8; }
+
+/* Dropdown panel — ẩn mặc định */
+.nav-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  min-width: 180px;
+  padding: 8px 0;
+  z-index: 1000;
+  /* Mũi tên nhỏ trỏ lên */
+  border-top: 3px solid #e44d26;
+}
+
+/* Hiện dropdown khi hover vào wrapper */
+.nav-dropdown-wrap:hover .nav-dropdown {
+  display: block;
+}
+
+/* Link trong dropdown */
+.nav-dropdown a {
+  display: block;
+  padding: 9px 18px;
+  color: #333;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 400;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+.nav-dropdown a:hover {
+  background: #fff5f3;
+  color: #e44d26;
+}
+
+/* ── Mobile menu section label ───────────────────────────────────────────── */
+.mobile-menu-section {
+  padding: 10px 16px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #aaa;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #fafafa;
+}
