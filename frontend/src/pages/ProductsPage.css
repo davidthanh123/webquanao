@@ -1,0 +1,100 @@
+/* ── Thêm vào cuối file ProductsPage.css ─────────────────────────────────── */
+
+/* Số lượng sản phẩm */
+.products-count {
+  font-size: 13px;
+  color: #888;
+  margin: 2px 0 0;
+}
+
+/* ── Pagination ─────────────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 40px 0 20px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #e44d26;
+  color: #e44d26;
+  background: #fff5f3;
+}
+
+.page-btn.active {
+  background: #e44d26;
+  border-color: #e44d26;
+  color: #fff;
+  font-weight: 600;
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-nav {
+  color: #555;
+}
+
+.page-ellipsis {
+  font-size: 16px;
+  color: #aaa;
+  padding: 0 4px;
+  line-height: 36px;
+  user-select: none;
+}
+
+/* ── Sidebar category nhóm ──────────────────────────────────────────────── */
+.cat-group {
+  margin-top: 6px;
+}
+
+.cat-group-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #aaa;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 6px 0 3px 2px;
+}
+
+.filter-option-sub {
+  padding-left: 14px !important;
+  font-size: 13px !important;
+}
+
+/* ── Skeleton loading ────────────────────────────────────────────────────── */
+.product-skeleton {
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  aspect-ratio: 3/4;
+  min-height: 280px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
