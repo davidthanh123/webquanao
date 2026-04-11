@@ -6,108 +6,66 @@ import { getProducts, getCategories } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import './ProductsPage.css';
 
-// ── Pagination thông minh ────────────────────────────────────────────────────
 function Pagination({ page, totalPages, onChange }) {
   if (totalPages <= 1) return null;
   const delta = 2;
   const pages = [];
   const rangeStart = Math.max(2, page - delta);
   const rangeEnd   = Math.min(totalPages - 1, page + delta);
-
   pages.push(1);
   if (rangeStart > 2)            pages.push('l-dot');
   for (let i = rangeStart; i <= rangeEnd; i++) pages.push(i);
   if (rangeEnd < totalPages - 1) pages.push('r-dot');
   if (totalPages > 1)            pages.push(totalPages);
-
   return (
     <div className="pagination">
-      <button
-        className="page-btn page-nav"
-        onClick={() => onChange(page - 1)}
-        disabled={page === 1}
-      >
+      <button className="page-btn page-nav" onClick={() => onChange(page - 1)} disabled={page === 1}>
         <ChevronLeft size={15} />
       </button>
       {pages.map((p) =>
         typeof p === 'string'
           ? <span key={p} className="page-ellipsis">…</span>
-          : <button
-              key={p}
-              className={`page-btn ${page === p ? 'active' : ''}`}
-              onClick={() => onChange(p)}
-            >
-              {p}
-            </button>
+          : <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => onChange(p)}>{p}</button>
       )}
-      <button
-        className="page-btn page-nav"
-        onClick={() => onChange(page + 1)}
-        disabled={page === totalPages}
-      >
+      <button className="page-btn page-nav" onClick={() => onChange(page + 1)} disabled={page === totalPages}>
         <ChevronRight size={15} />
       </button>
     </div>
   );
 }
 
-// ── FIX BUG 1: Nhóm danh mục dựa theo tên thay vì hardcode slug ─────────────
-// Vì slug trong DB có thể khác với những gì hardcode,
-// chúng ta nhóm theo keyword trong tên category.
-const GROUP_MATCHERS = [
+// ── 18 slugs chính xác từ DB Railway ─────────────────────────────────────────
+// Page1: c1=ao-thun-nam, c10=dam-nu, c11=ao-tre-em, c12=quan-tre-em, c13=dam-be-gai
+// Page2: c14=tui-xach, c15=giay-nam, c16=giay-nu, c17=phu-kien, c18=do-the-thao
+// Page3: c2=ao-so-mi-nam, c3=quan-nam, c4=ao-khoac-nam, c5=ao-thun-nu, c6=ao-so-mi-nu
+// Page4: c7=quan-nu, c8=vay, c9=ao-khoac-nu
+const CAT_GROUPS = [
   {
     label: 'Nam',
-    match: (name) =>
-      /nam/i.test(name) && !/nữ|nu|tre em|trẻ|baby|bé/i.test(name),
+    slugs: ['ao-thun-nam', 'ao-so-mi-nam', 'quan-nam', 'ao-khoac-nam'],
   },
   {
     label: 'Nữ',
-    match: (name) =>
-      /nữ|nu/i.test(name) && !/nam|tre em|trẻ|baby|bé/i.test(name),
+    slugs: ['ao-thun-nu', 'ao-so-mi-nu', 'quan-nu', 'vay', 'ao-khoac-nu', 'dam-nu'],
   },
   {
     label: 'Trẻ em',
-    match: (name) => /trẻ|tre|em|bé|be|baby|kids/i.test(name),
+    slugs: ['ao-tre-em', 'quan-tre-em', 'dam-be-gai'],
   },
   {
     label: 'Phụ kiện',
-    match: (name) => /túi|tui|giày|giay|phụ|phu|kiện|kien|bag|shoe/i.test(name),
+    slugs: ['tui-xach', 'giay-nam', 'giay-nu', 'phu-kien'],
   },
   {
     label: 'Thể thao',
-    match: (name) => /thể|the|thao|sport|gym|fitness/i.test(name),
+    slugs: ['do-the-thao'],
   },
 ];
-
-function groupCategories(categories) {
-  const groups = GROUP_MATCHERS.map(g => ({ label: g.label, cats: [] }));
-  const ungrouped = [];
-
-  categories.forEach(cat => {
-    let matched = false;
-    for (let i = 0; i < GROUP_MATCHERS.length; i++) {
-      if (GROUP_MATCHERS[i].match(cat.name)) {
-        groups[i].cats.push(cat);
-        matched = true;
-        break;
-      }
-    }
-    if (!matched) ungrouped.push(cat);
-  });
-
-  // Thêm ungrouped vào cuối nếu có
-  if (ungrouped.length > 0) {
-    groups.push({ label: 'Khác', cats: ungrouped });
-  }
-
-  return groups.filter(g => g.cats.length > 0);
-}
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts]         = useState([]);
   const [categories, setCategories]     = useState([]);
-  const [catGroups, setCatGroups]       = useState([]);
   const [totalPages, setTotalPages]     = useState(1);
   const [total, setTotal]               = useState(0);
   const [loading, setLoading]           = useState(true);
@@ -122,22 +80,15 @@ export default function ProductsPage() {
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
 
-  // ── Load categories 1 lần, rồi nhóm lại ──────────────────────────────────
   useEffect(() => {
     getCategories()
-      .then(r => {
-        const cats = r.data || [];
-        setCategories(cats);
-        setCatGroups(groupCategories(cats));
-      })
+      .then(r => setCategories(r.data || []))
       .catch(err => console.error('getCategories error:', err));
   }, []);
 
-  // ── Load products khi filter thay đổi ────────────────────────────────────
   useEffect(() => {
     setLoading(true);
     setFetchError(null);
-
     const params = { page, limit: 20, sort };
     if (category) params.category = category;
     if (search)   params.search   = search;
@@ -162,11 +113,10 @@ export default function ProductsPage() {
   const setParam = (key, val) => {
     const p = new URLSearchParams(searchParams);
     if (val) p.set(key, val); else p.delete(key);
-    p.delete('page'); // Reset về trang 1 khi đổi filter
+    p.delete('page');
     setSearchParams(p);
   };
 
-  // ── FIX: setParam nhiều key cùng lúc (dùng cho price range) ──────────────
   const setParams = (kvPairs) => {
     const p = new URLSearchParams(searchParams);
     kvPairs.forEach(([key, val]) => {
@@ -200,26 +150,15 @@ export default function ProductsPage() {
         <div className="products-header">
           <div>
             <h1 className="products-title">{pageTitle}</h1>
-            {!loading && (
-              <p className="products-count">{total.toLocaleString()} sản phẩm</p>
-            )}
+            {!loading && <p className="products-count">{total.toLocaleString()} sản phẩm</p>}
           </div>
           <div className="products-toolbar">
-            <button
-              className="filter-toggle-btn"
-              onClick={() => setShowFilter(!showFilter)}
-            >
+            <button className="filter-toggle-btn" onClick={() => setShowFilter(!showFilter)}>
               <SlidersHorizontal size={15} />
               Bộ lọc
-              {activeCount > 0 && (
-                <span className="filter-count">{activeCount}</span>
-              )}
+              {activeCount > 0 && <span className="filter-count">{activeCount}</span>}
             </button>
-            <select
-              className="sort-select"
-              value={sort}
-              onChange={e => setParam('sort', e.target.value)}
-            >
+            <select className="sort-select" value={sort} onChange={e => setParam('sort', e.target.value)}>
               <option value="newest">Mới nhất</option>
               <option value="bestseller">Bán chạy</option>
               <option value="rating">Đánh giá cao</option>
@@ -230,13 +169,11 @@ export default function ProductsPage() {
         </div>
 
         <div className="products-layout">
-          {/* ── Sidebar ──────────────────────────────────────────────────── */}
+          {/* ── Sidebar ── */}
           <aside className={`filter-sidebar ${showFilter ? 'open' : ''}`}>
             <div className="filter-header">
               <h3>Bộ lọc</h3>
-              <button onClick={() => setShowFilter(false)}>
-                <X size={18} />
-              </button>
+              <button onClick={() => setShowFilter(false)}><X size={18} /></button>
             </div>
 
             {activeCount > 0 && (
@@ -245,7 +182,7 @@ export default function ProductsPage() {
               </button>
             )}
 
-            {/* ── FIX BUG 1: Danh mục từ DB, nhóm động ── */}
+            {/* Danh mục — slugs khớp 100% với DB */}
             <div className="filter-group">
               <h4>Danh mục</h4>
               <button
@@ -255,42 +192,43 @@ export default function ProductsPage() {
                 Tất cả
               </button>
 
-              {catGroups.map(group => (
-                <div key={group.label} className="cat-group">
-                  <span className="cat-group-label">{group.label}</span>
-                  {group.cats.map(c => (
-                    <button
-                      key={c.id}
-                      className={`filter-option filter-option-sub ${category === c.slug ? 'active' : ''}`}
-                      onClick={() => setParam('category', c.slug)}
-                    >
-                      {c.name}
-                    </button>
-                  ))}
-                </div>
-              ))}
+              {CAT_GROUPS.map(group => {
+                const groupCats = categories.filter(c => group.slugs.includes(c.slug));
+                // Fallback: nếu categories API chưa load xong, render từ slugs hardcode
+                const items = groupCats.length > 0
+                  ? groupCats
+                  : group.slugs.map(s => ({
+                      slug: s,
+                      id: s,
+                      name: s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                    }));
 
-              {/* Fallback: nếu catGroups chưa load, hiện flat list */}
-              {catGroups.length === 0 && categories.map(c => (
-                <button
-                  key={c.id}
-                  className={`filter-option ${category === c.slug ? 'active' : ''}`}
-                  onClick={() => setParam('category', c.slug)}
-                >
-                  {c.name}
-                </button>
-              ))}
+                return (
+                  <div key={group.label} className="cat-group">
+                    <span className="cat-group-label">{group.label}</span>
+                    {items.map(c => (
+                      <button
+                        key={c.slug}
+                        className={`filter-option filter-option-sub ${category === c.slug ? 'active' : ''}`}
+                        onClick={() => setParam('category', c.slug)}
+                      >
+                        {c.name}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
 
-            {/* ── Khoảng giá ──────────────────────────────────────────────── */}
+            {/* Khoảng giá */}
             <div className="filter-group">
               <h4>Khoảng giá</h4>
               {[
-                ['', '',        'Tất cả'],
-                ['0', '200000', 'Dưới 200K'],
-                ['200000', '500000', '200K – 500K'],
+                ['', '',          'Tất cả'],
+                ['0', '200000',   'Dưới 200K'],
+                ['200000', '500000',  '200K – 500K'],
                 ['500000', '1000000', '500K – 1tr'],
-                ['1000000', '', 'Trên 1tr'],
+                ['1000000', '',   'Trên 1tr'],
               ].map(([min, max, label]) => (
                 <button
                   key={label}
@@ -302,7 +240,7 @@ export default function ProductsPage() {
               ))}
             </div>
 
-            {/* ── Tags ─────────────────────────────────────────────────────── */}
+            {/* Tags */}
             <div className="filter-group">
               <h4>Loại sản phẩm</h4>
               {[
@@ -322,7 +260,7 @@ export default function ProductsPage() {
             </div>
           </aside>
 
-          {/* ── Products ─────────────────────────────────────────────────── */}
+          {/* ── Products ── */}
           <div className="products-content">
             {loading ? (
               <div className="product-grid">
@@ -334,17 +272,13 @@ export default function ProductsPage() {
               <div className="empty-state">
                 <p style={{ fontSize: 48 }}>⚠️</p>
                 <p>{fetchError}</p>
-                <button className="btn-primary" onClick={() => window.location.reload()}>
-                  Thử lại
-                </button>
+                <button className="btn-primary" onClick={() => window.location.reload()}>Thử lại</button>
               </div>
             ) : products.length === 0 ? (
               <div className="empty-state">
                 <p style={{ fontSize: 48 }}>😔</p>
                 <p>Không tìm thấy sản phẩm nào</p>
-                <button className="btn-primary" onClick={clearFilters}>
-                  Xóa bộ lọc
-                </button>
+                <button className="btn-primary" onClick={clearFilters}>Xóa bộ lọc</button>
               </div>
             ) : (
               <>
