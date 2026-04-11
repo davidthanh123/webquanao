@@ -1,14 +1,32 @@
-// routes/products.js — Dùng MySQL qua Sequelize (không còn db.js)
+// routes/products.js — Fix lỗi Table 'railway.reviews' doesn't exist
 const express = require('express');
 const { randomUUID: uuidv4 } = require('crypto');
-const { Op } = require('sequelize');
+const { Op, QueryTypes } = require('sequelize');
 const Product  = require('../models/Product');
 const Category = require('../models/Category');
-const Review   = require('../models/Review');
-const User     = require('../models/User');
 const { adminMiddleware } = require('../middleware/auth');
 
+// ── Import có guard: nếu model chưa tồn tại thì không crash ──────────────────
+let Review, User;
+try {
+  Review = require('../models/Review');
+  User   = require('../models/User');
+} catch (e) {
+  console.warn('⚠️  Review/User model không tồn tại, bỏ qua reviews');
+}
+
 const router = express.Router();
+
+// ── Helper: kiểm tra bảng reviews có tồn tại không ───────────────────────────
+async function reviewsTableExists() {
+  if (!Review) return false;
+  try {
+    await Review.findOne({ limit: 1 });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 // ─── Helper: parse JSON string fields từ MySQL ────────────────────────────────
 function parseProduct(p) {
@@ -17,11 +35,12 @@ function parseProduct(p) {
     if (typeof obj[field] === 'string') {
       try { obj[field] = JSON.parse(obj[field]); } catch { obj[field] = []; }
     }
+    if (!Array.isArray(obj[field])) obj[field] = [];
   });
   return obj;
 }
 
-// ─── GET /api/products — Lấy danh sách (filter, search, sort, phân trang) ────
+// ─── GET /api/products — Lấy danh sách ───────────────────────────────────────
 router.get('/', async (req, res) => {
   try {
     let { category, search, sort, minPrice, maxPrice, page = 1, limit = 12, tag } = req.query;
@@ -30,7 +49,6 @@ router.get('/', async (req, res) => {
 
     const where = {};
 
-    // Filter theo category (slug hoặc id)
     if (category) {
       const cat = await Category.findOne({
         where: { [Op.or]: [{ slug: category }, { id: category }] }
@@ -39,24 +57,20 @@ router.get('/', async (req, res) => {
       else return res.json({ products: [], total: 0, page, totalPages: 0 });
     }
 
-    // Search tên sản phẩm
     if (search) {
       where.name = { [Op.like]: `%${search}%` };
     }
 
-    // Filter giá
     if (minPrice || maxPrice) {
       where.price = {};
       if (minPrice) where.price[Op.gte] = Number(minPrice);
       if (maxPrice) where.price[Op.lte] = Number(maxPrice);
     }
 
-    // Filter tag (JSON string chứa array)
     if (tag) {
       where.tags = { [Op.like]: `%${tag}%` };
     }
 
-    // Sort
     let order = [['createdAt', 'DESC']];
     if (sort === 'price_asc')  order = [['price', 'ASC']];
     if (sort === 'price_desc') order = [['price', 'DESC']];
@@ -65,13 +79,9 @@ router.get('/', async (req, res) => {
     if (sort === 'newest')     order = [['createdAt', 'DESC']];
 
     const { count, rows } = await Product.findAndCountAll({
-      where,
-      order,
-      limit,
-      offset: (page - 1) * limit,
+      where, order, limit, offset: (page - 1) * limit,
     });
 
-    // Lấy tên category cho từng sản phẩm
     const catIds = [...new Set(rows.map(p => p.categoryId))];
     const cats   = await Category.findAll({ where: { id: catIds } });
     const catMap = Object.fromEntries(cats.map(c => [c.id, c.name]));
@@ -88,7 +98,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ─── GET /api/products/meta/categories — Phải đặt TRƯỚC /:slug ───────────────
+// ─── GET /api/products/meta/categories ───────────────────────────────────────
 router.get('/meta/categories', async (req, res) => {
   try {
     const categories = await Category.findAll({ order: [['id', 'ASC']] });
@@ -108,21 +118,36 @@ router.get('/:slug', async (req, res) => {
 
     const category = await Category.findByPk(product.categoryId);
 
-    // Lấy reviews kèm thông tin user
-    const reviews = await Review.findAll({
-      where: { productId: product.id },
-      include: [{ model: User, as: 'user', attributes: ['name', 'avatar'] }],
-      order: [['createdAt', 'DESC']],
-    });
+    // ── FIX: chỉ query reviews nếu bảng tồn tại ──────────────────────────────
+    let reviewsData = [];
+    const hasReviews = await reviewsTableExists();
 
-    const reviewsData = reviews.map(r => {
-      const obj = r.toJSON();
-      return {
-        ...obj,
-        userName:   obj.user?.name   || 'Ẩn danh',
-        userAvatar: obj.user?.avatar || null,
-      };
-    });
+    if (hasReviews) {
+      try {
+        // Include User chỉ khi User model có sẵn
+        const includeOpts = User
+          ? [{ model: User, as: 'user', attributes: ['name', 'avatar'] }]
+          : [];
+
+        const reviews = await Review.findAll({
+          where: { productId: product.id },
+          include: includeOpts,
+          order: [['createdAt', 'DESC']],
+        });
+
+        reviewsData = reviews.map(r => {
+          const obj = r.toJSON();
+          return {
+            ...obj,
+            userName:   obj.user?.name   || 'Ẩn danh',
+            userAvatar: obj.user?.avatar || null,
+          };
+        });
+      } catch (reviewErr) {
+        console.warn('⚠️  Lỗi khi lấy reviews:', reviewErr.message);
+        // Không crash, trả về mảng rỗng
+      }
+    }
 
     res.json({
       ...parseProduct(product),
@@ -139,18 +164,10 @@ router.get('/:slug', async (req, res) => {
 router.post('/', adminMiddleware, async (req, res) => {
   try {
     const body = { ...req.body };
-    // Stringify arrays nếu frontend gửi lên dạng array
     ['images', 'sizes', 'colors', 'tags'].forEach(f => {
       if (Array.isArray(body[f])) body[f] = JSON.stringify(body[f]);
     });
-
-    const product = await Product.create({
-      id: uuidv4(),
-      sold: 0,
-      rating: 0,
-      reviewCount: 0,
-      ...body,
-    });
+    const product = await Product.create({ id: uuidv4(), sold: 0, rating: 0, reviewCount: 0, ...body });
     res.status(201).json(parseProduct(product));
   } catch (err) {
     res.status(500).json({ message: 'Lỗi tạo sản phẩm', error: err.message });
@@ -162,12 +179,10 @@ router.put('/:id', adminMiddleware, async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
-
     const body = { ...req.body };
     ['images', 'sizes', 'colors', 'tags'].forEach(f => {
       if (Array.isArray(body[f])) body[f] = JSON.stringify(body[f]);
     });
-
     await product.update(body);
     res.json(parseProduct(product));
   } catch (err) {
@@ -175,7 +190,7 @@ router.put('/:id', adminMiddleware, async (req, res) => {
   }
 });
 
-// ─── DELETE /api/products/:id — Xóa (admin) ──────────────────────────────────
+// ─── DELETE /api/products/:id ─────────────────────────────────────────────────
 router.delete('/:id', adminMiddleware, async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
@@ -187,28 +202,25 @@ router.delete('/:id', adminMiddleware, async (req, res) => {
   }
 });
 
-// ─── POST /api/products/:id/reviews — Thêm đánh giá ─────────────────────────
+// ─── POST /api/products/:id/reviews ──────────────────────────────────────────
 router.post('/:id/reviews', async (req, res) => {
   try {
+    const hasReviews = await reviewsTableExists();
+    if (!hasReviews) {
+      return res.status(503).json({ message: 'Tính năng đánh giá chưa khả dụng' });
+    }
+
     const { userId, rating, comment } = req.body;
     const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
 
     const review = await Review.create({
-      id: uuidv4(),
-      productId: req.params.id,
-      userId,
-      rating,
-      comment,
+      id: uuidv4(), productId: req.params.id, userId, rating, comment,
     });
 
-    // Cập nhật rating trung bình
     const allReviews = await Review.findAll({ where: { productId: req.params.id } });
     const avgRating  = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
-    await product.update({
-      rating:      Number(avgRating.toFixed(1)),
-      reviewCount: allReviews.length,
-    });
+    await product.update({ rating: Number(avgRating.toFixed(1)), reviewCount: allReviews.length });
 
     res.status(201).json(review.toJSON());
   } catch (err) {
