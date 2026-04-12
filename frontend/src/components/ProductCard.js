@@ -11,9 +11,9 @@ const formatPrice = (p) =>
 // Nếu img đã là URL đầy đủ (https://images.unsplash.com/...) → dùng thẳng
 // Nếu là path tương đối → prefix backend
 function getImageUrl(img) {
-  if (!img) return '/images/placeholder.jpg';
+  if (!img) return 'https://placehold.co/300x400?text=No+Image';
   if (img.startsWith('http://') || img.startsWith('https://')) return img;
-  return `http://localhost:5000${img}`;
+  return `https://TÊN-APP-CỦA-BẠN.up.railway.app${img}`; // ← thay bằng URL thật
 }
 
 export default function ProductCard({ product }) {
@@ -32,14 +32,14 @@ export default function ProductCard({ product }) {
   } = product;
 
   const imageList = Array.isArray(images) ? images : [];
-  const tagList   = Array.isArray(tags)   ? tags   : [];
+  const tagList = Array.isArray(tags) ? tags : [];
 
   const discount = originalPrice > price
     ? Math.round((1 - price / originalPrice) * 100)
     : 0;
 
-  const isSale       = discount > 0 || tagList.includes('sale');
-  const isNew        = tagList.includes('new');
+  const isSale = discount > 0 || tagList.includes('sale');
+  const isNew = tagList.includes('new');
   const isBestseller = tagList.includes('bestseller');
 
   const handleAddToCart = (e) => {
@@ -60,7 +60,10 @@ export default function ProductCard({ product }) {
           alt={name}
           className="product-card-img"
           loading="lazy"
-          onError={e => { e.target.src = '/images/placeholder.jpg'; }}
+          onError={e => {
+            e.target.onerror = null;  // chặn loop
+            e.target.src = 'https://placehold.co/300x400?text=No+Image';
+          }}
         />
 
         {/* Badges */}
