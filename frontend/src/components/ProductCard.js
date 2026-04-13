@@ -13,7 +13,7 @@ const formatPrice = (p) =>
 function getImageUrl(img) {
   if (!img) return 'https://placehold.co/300x400?text=No+Image';
   if (img.startsWith('http://') || img.startsWith('https://')) return img;
-  return `https://TÊN-APP-CỦA-BẠN.up.railway.app${img}`; // ← thay bằng URL thật
+ return `https://webquanao-backend-production.up.railway.app${img}`;
 }
 
 export default function ProductCard({ product }) {

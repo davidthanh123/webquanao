@@ -75,7 +75,7 @@ export default function Navbar() {
                 {userMenuOpen && (
                   <div className="user-dropdown">
                     <Link to="/profile" onClick={() => setUserMenuOpen(false)}><User size={14} /> Tài khoản</Link>
-                    <Link to="/orders"  onClick={() => setUserMenuOpen(false)}><Package size={14} /> Đơn hàng</Link>
+                    <Link to="/orders" onClick={() => setUserMenuOpen(false)}><Package size={14} /> Đơn hàng</Link>
                     {user.role === 'admin' && (
                       <Link to="/admin" onClick={() => setUserMenuOpen(false)}><Settings size={14} /> Quản trị</Link>
                     )}
@@ -99,79 +99,80 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── Categories bar — Desktop với dropdown ──────────────────────────── */}
-      <nav className="navbar-cats">
-        <div className="container navbar-cats-inner">
+     {/* ── Categories bar — Desktop với dropdown ──────────────────────────── */}
+<nav className="navbar-cats">
+  <div className="container navbar-cats-inner">
 
-          <Link to="/products" className="nav-cat-link">Tất cả</Link>
+    <Link to="/products" className="nav-cat-link">Tất cả</Link>
 
-          {/* Áo Nam */}
-          <div className="nav-dropdown-wrap">
-            <span className="nav-cat-trigger">
-              Áo Nam <ChevronDown size={12} />
-            </span>
-            <div className="nav-dropdown">
-              <Link to="/products?category=ao-thun-nam">Áo Thun Nam</Link>
-              <Link to="/products?category=ao-so-mi-nam">Áo Sơ Mi Nam</Link>
-              <Link to="/products?category=ao-khoac-nam">Áo Khoác Nam</Link>
-            </div>
-          </div>
+    {/* Áo Nam */}
+    <div className="nav-dropdown-wrap">
+      <Link to="/products?category=ao-nam" className="nav-cat-trigger">
+        Áo Nam <ChevronDown size={12} />
+      </Link>
+      <div className="nav-dropdown">
+        <Link to="/products?category=ao-thun-nam">Áo Thun Nam</Link>
+        <Link to="/products?category=ao-so-mi-nam">Áo Sơ Mi Nam</Link>
+        <Link to="/products?category=ao-khoac-nam">Áo Khoác Nam</Link>
+      </div>
+    </div>
 
-          {/* Quần Nam */}
-          <div className="nav-dropdown-wrap">
-            <span className="nav-cat-trigger">
-              Quần Nam <ChevronDown size={12} />
-            </span>
-            <div className="nav-dropdown">
-              <Link to="/products?category=quan-nam">Quần Jean / Kaki</Link>
-            </div>
-          </div>
+    {/* Quần Nam */}
+    <div className="nav-dropdown-wrap">
+      <Link to="/products?category=quan-nam" className="nav-cat-trigger">
+        Quần Nam <ChevronDown size={12} />
+      </Link>
+      <div className="nav-dropdown">
+        <Link to="/products?category=quan-jean-nam">Quần Jean Nam</Link>
+        <Link to="/products?category=quan-kaki-nam">Quần Kaki Nam</Link>
+      </div>
+    </div>
 
-          {/* Áo Nữ */}
-          <div className="nav-dropdown-wrap">
-            <span className="nav-cat-trigger">
-              Áo Nữ <ChevronDown size={12} />
-            </span>
-            <div className="nav-dropdown">
-              <Link to="/products?category=ao-thun-nu">Áo Thun Nữ</Link>
-              <Link to="/products?category=ao-so-mi-nu">Áo Sơ Mi Nữ</Link>
-              <Link to="/products?category=ao-khoac-nu">Áo Khoác Nữ</Link>
-            </div>
-          </div>
+    {/* Áo Nữ */}
+    <div className="nav-dropdown-wrap">
+      <Link to="/products?category=ao-nu" className="nav-cat-trigger">
+        Áo Nữ <ChevronDown size={12} />
+      </Link>
+      <div className="nav-dropdown">
+        <Link to="/products?category=ao-thun-nu">Áo Thun Nữ</Link>
+        <Link to="/products?category=ao-so-mi-nu">Áo Sơ Mi Nữ</Link>
+        <Link to="/products?category=ao-khoac-nu">Áo Khoác Nữ</Link>
+      </div>
+    </div>
 
-          {/* Váy & Đầm */}
-          <div className="nav-dropdown-wrap">
-            <span className="nav-cat-trigger">
-              Váy Đầm <ChevronDown size={12} />
-            </span>
-            <div className="nav-dropdown">
-              <Link to="/products?category=quan-nu">Quần Nữ</Link>
-              <Link to="/products?category=vay">Váy</Link>
-              <Link to="/products?category=dam-nu">Đầm Nữ</Link>
-            </div>
-          </div>
+    {/* Váy & Đầm */}
+    <div className="nav-dropdown-wrap">
+      <Link to="/products?category=vay-dam" className="nav-cat-trigger">
+        Váy Đầm <ChevronDown size={12} />
+      </Link>
+      <div className="nav-dropdown">
+        <Link to="/products?category=quan-nu">Quần Nữ</Link>
+        <Link to="/products?category=vay">Váy</Link>
+        <Link to="/products?category=dam-nu">Đầm Nữ</Link>
+      </div>
+    </div>
 
-          {/* Phụ Kiện */}
-          <div className="nav-dropdown-wrap">
-            <span className="nav-cat-trigger">
-              Phụ Kiện <ChevronDown size={12} />
-            </span>
-            <div className="nav-dropdown">
-              <Link to="/products?category=tui-xach">Túi Xách</Link>
-              <Link to="/products?category=giay-nam">Giày Nam</Link>
-              <Link to="/products?category=giay-nu">Giày Nữ</Link>
-              <Link to="/products?category=phu-kien">Phụ Kiện</Link>
-            </div>
-          </div>
+    {/* Phụ Kiện */}
+    <div className="nav-dropdown-wrap">
+      <Link to="/products?category=phu-kien" className="nav-cat-trigger">
+        Phụ Kiện <ChevronDown size={12} />
+      </Link>
+      <div className="nav-dropdown">
+        <Link to="/products?category=tui-xach">Túi Xách</Link>
+        <Link to="/products?category=giay-nam">Giày Nam</Link>
+        <Link to="/products?category=giay-nu">Giày Nữ</Link>
+        <Link to="/products?category=phu-kien-khac">Phụ Kiện Khác</Link>
+      </div>
+    </div>
 
-          <Link to="/products?category=do-the-thao" className="nav-cat-link">Thể Thao</Link>
+    <Link to="/products?category=do-the-thao" className="nav-cat-link">Thể Thao</Link>
 
-          <Link to="/products?tag=sale" className="nav-cat-link nav-sale">
-            🔥 Flash Sale
-          </Link>
+    <Link to="/products?tag=sale" className="nav-cat-link nav-sale">
+      🔥 Flash Sale
+    </Link>
 
-        </div>
-      </nav>
+  </div>
+</nav>
 
       {/* ── Mobile menu ────────────────────────────────────────────────────── */}
       {menuOpen && (
@@ -187,7 +188,7 @@ export default function Navbar() {
           </form>
 
           <div className="mobile-menu-section">Áo Nam</div>
-          <Link to="/products?category=ao-thun-nam"  onClick={() => setMenuOpen(false)}>↳ Áo Thun Nam</Link>
+          <Link to="/products?category=ao-thun-nam" onClick={() => setMenuOpen(false)}>↳ Áo Thun Nam</Link>
           <Link to="/products?category=ao-so-mi-nam" onClick={() => setMenuOpen(false)}>↳ Áo Sơ Mi Nam</Link>
           <Link to="/products?category=ao-khoac-nam" onClick={() => setMenuOpen(false)}>↳ Áo Khoác Nam</Link>
 
@@ -195,20 +196,20 @@ export default function Navbar() {
           <Link to="/products?category=quan-nam" onClick={() => setMenuOpen(false)}>↳ Quần Jean / Kaki</Link>
 
           <div className="mobile-menu-section">Áo Nữ</div>
-          <Link to="/products?category=ao-thun-nu"  onClick={() => setMenuOpen(false)}>↳ Áo Thun Nữ</Link>
+          <Link to="/products?category=ao-thun-nu" onClick={() => setMenuOpen(false)}>↳ Áo Thun Nữ</Link>
           <Link to="/products?category=ao-so-mi-nu" onClick={() => setMenuOpen(false)}>↳ Áo Sơ Mi Nữ</Link>
           <Link to="/products?category=ao-khoac-nu" onClick={() => setMenuOpen(false)}>↳ Áo Khoác Nữ</Link>
 
           <div className="mobile-menu-section">Váy & Đầm</div>
           <Link to="/products?category=quan-nu" onClick={() => setMenuOpen(false)}>↳ Quần Nữ</Link>
-          <Link to="/products?category=vay"     onClick={() => setMenuOpen(false)}>↳ Váy</Link>
-          <Link to="/products?category=dam-nu"  onClick={() => setMenuOpen(false)}>↳ Đầm Nữ</Link>
+          <Link to="/products?category=vay" onClick={() => setMenuOpen(false)}>↳ Váy</Link>
+          <Link to="/products?category=dam-nu" onClick={() => setMenuOpen(false)}>↳ Đầm Nữ</Link>
 
           <div className="mobile-menu-section">Phụ Kiện</div>
-          <Link to="/products?category=tui-xach"  onClick={() => setMenuOpen(false)}>↳ Túi Xách</Link>
-          <Link to="/products?category=giay-nam"  onClick={() => setMenuOpen(false)}>↳ Giày Nam</Link>
-          <Link to="/products?category=giay-nu"   onClick={() => setMenuOpen(false)}>↳ Giày Nữ</Link>
-          <Link to="/products?category=phu-kien"  onClick={() => setMenuOpen(false)}>↳ Phụ Kiện</Link>
+          <Link to="/products?category=tui-xach" onClick={() => setMenuOpen(false)}>↳ Túi Xách</Link>
+          <Link to="/products?category=giay-nam" onClick={() => setMenuOpen(false)}>↳ Giày Nam</Link>
+          <Link to="/products?category=giay-nu" onClick={() => setMenuOpen(false)}>↳ Giày Nữ</Link>
+          <Link to="/products?category=phu-kien" onClick={() => setMenuOpen(false)}>↳ Phụ Kiện</Link>
 
           <Link to="/products?category=do-the-thao" onClick={() => setMenuOpen(false)}>🏃 Thể Thao</Link>
           <Link to="/products?tag=sale" onClick={() => setMenuOpen(false)}>🔥 Flash Sale</Link>
@@ -219,12 +220,12 @@ export default function Navbar() {
           {user ? (
             <>
               <Link to="/profile" onClick={() => setMenuOpen(false)}>👤 Tài khoản</Link>
-              <Link to="/orders"  onClick={() => setMenuOpen(false)}>📦 Đơn hàng</Link>
+              <Link to="/orders" onClick={() => setMenuOpen(false)}>📦 Đơn hàng</Link>
               <button onClick={() => { handleLogout(); setMenuOpen(false); }}>🚪 Đăng xuất</button>
             </>
           ) : (
             <>
-              <Link to="/login"    onClick={() => setMenuOpen(false)}>🔑 Đăng nhập</Link>
+              <Link to="/login" onClick={() => setMenuOpen(false)}>🔑 Đăng nhập</Link>
               <Link to="/register" onClick={() => setMenuOpen(false)}>📝 Đăng ký</Link>
             </>
           )}
