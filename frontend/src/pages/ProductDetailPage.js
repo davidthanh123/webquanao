@@ -15,9 +15,9 @@ const formatPrice = (p) =>
 // Nếu img đã là URL đầy đủ (http/https) → dùng thẳng
 // Nếu là path tương đối (/images/...) → prefix localhost
 function getImageUrl(img) {
-  if (!img) return '/images/placeholder.jpg';
+  if (!img) return 'https://placehold.co/600x600?text=No+Image';
   if (img.startsWith('http://') || img.startsWith('https://')) return img;
-  return `http://localhost:5000${img}`;
+  return `https://webquanao-production.up.railway.app${img}`;
 }
 
 export default function ProductDetailPage() {
@@ -150,7 +150,7 @@ export default function ProductDetailPage() {
                 src={getImageUrl(product.images[selectedImg])}
                 alt={product.name}
                 className="main-img"
-                onError={e => { e.target.src = '/images/placeholder.jpg'; }}
+onError={e => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x600?text=No+Image'; }}
               />
               {discount > 0 && (
                 <span className="detail-badge badge badge-red">-{discount}%</span>
@@ -168,7 +168,7 @@ export default function ProductDetailPage() {
                     <img
                       src={getImageUrl(img)}
                       alt={`Ảnh ${i + 1}`}
-                      onError={e => { e.target.src = '/images/placeholder.jpg'; }}
+                      onError={e => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x600?text=No+Image'; }}
                     />
                   </button>
                 ))}
