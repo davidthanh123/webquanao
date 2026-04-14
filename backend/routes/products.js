@@ -50,12 +50,30 @@ router.get('/', async (req, res) => {
     const where = {};
 
     if (category) {
-      const cat = await Category.findOne({
-        where: { [Op.or]: [{ slug: category }, { id: category }] }
-      });
-      if (cat) where.categoryId = cat.id;
-      else return res.json({ products: [], total: 0, page, totalPages: 0 });
-    }
+  const cat = await Category.findOne({
+    where: { [Op.or]: [{ slug: category }, { id: category }] }
+  });
+  if (!cat) return res.json({ products: [], total: 0, page, totalPages: 0 });
+
+  // Map category cha → các slug con
+  const childrenMap = {
+    'ao-nam':       ['ao-thun-nam', 'ao-so-mi-nam', 'ao-khoac-nam'],
+    'ao-nu':        ['ao-thun-nu',  'ao-so-mi-nu',  'ao-khoac-nu'],
+    'vay-dam':      ['quan-nu', 'vay', 'dam-nu'],
+    'quan-nam-cha': ['quan-nam'],
+    'phu-kien-cha': ['tui-xach', 'giay-nam', 'giay-nu', 'phu-kien'],
+  };
+
+  if (childrenMap[cat.slug]) {
+    const childCats = await Category.findAll({
+      where: { slug: { [Op.in]: childrenMap[cat.slug] } }
+    });
+    const childIds = childCats.map(c => c.id);
+    where.categoryId = { [Op.in]: childIds };
+  } else {
+    where.categoryId = cat.id;
+  }
+}
 
     if (search) {
       where.name = { [Op.like]: `%${search}%` };
