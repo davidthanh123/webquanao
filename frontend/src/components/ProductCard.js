@@ -11,14 +11,14 @@ const formatPrice = (p) =>
 // Nếu img đã là URL đầy đủ (https://images.unsplash.com/...) → dùng thẳng
 // Nếu là path tương đối → prefix backend
 function getImageUrl(img) {
-  if (!img) return 'https://placehold.co/300x400?text=No+Image';
+  if (!img) return 'https://placehold.co/600x600?text=No+Image';
+  
+  // Nếu là link Unsplash
   if (img.includes('unsplash.com')) {
-    // Xóa params cũ, thêm params Unsplash chấp nhận hotlink
+    // Xóa các tham số cũ để tối ưu lại kích thước và định dạng
     const base = img.split('?')[0];
-    return `${base}?w=600&fm=jpg&fit=crop&auto=format&q=80`;
-  }
-  if (img.startsWith('http://') || img.startsWith('https://')) return img;
-  return `https://webquanao-production.up.railway.app${img}`;
+    return `${base}?w=800&q=80&auto=format&fit=crop`;
+  } return `https://webquanao-production.up.railway.app${img}`;
 }
 
 export default function ProductCard({ product }) {
