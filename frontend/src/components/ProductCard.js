@@ -12,8 +12,13 @@ const formatPrice = (p) =>
 // Nếu là path tương đối → prefix backend
 function getImageUrl(img) {
   if (!img) return 'https://placehold.co/300x400?text=No+Image';
+  if (img.includes('unsplash.com')) {
+    // Xóa params cũ, thêm params Unsplash chấp nhận hotlink
+    const base = img.split('?')[0];
+    return `${base}?w=600&fm=jpg&fit=crop&auto=format&q=80`;
+  }
   if (img.startsWith('http://') || img.startsWith('https://')) return img;
- return `https://webquanao-production.up.railway.app${img}`;
+  return `https://webquanao-production.up.railway.app${img}`;
 }
 
 export default function ProductCard({ product }) {

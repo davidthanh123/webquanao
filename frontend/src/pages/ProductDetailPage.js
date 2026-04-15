@@ -15,26 +15,31 @@ const formatPrice = (p) =>
 // Nếu img đã là URL đầy đủ (http/https) → dùng thẳng
 // Nếu là path tương đối (/images/...) → prefix localhost
 function getImageUrl(img) {
-  if (!img) return 'https://placehold.co/600x600?text=No+Image';
+  if (!img) return 'https://placehold.co/300x400?text=No+Image';
+  if (img.includes('unsplash.com')) {
+    // Xóa params cũ, thêm params Unsplash chấp nhận hotlink
+    const base = img.split('?')[0];
+    return `${base}?w=600&fm=jpg&fit=crop&auto=format&q=80`;
+  }
   if (img.startsWith('http://') || img.startsWith('https://')) return img;
   return `https://webquanao-production.up.railway.app${img}`;
 }
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
   const { addItem } = useCart();
   const { user } = useAuth();
 
-  const [product, setProduct]           = useState(null);
-  const [loading, setLoading]           = useState(true);
-  const [error, setError]               = useState(null);          // ← FIX BUG 3: track lỗi
-  const [selectedImg, setSelectedImg]   = useState(0);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);          // ← FIX BUG 3: track lỗi
+  const [selectedImg, setSelectedImg] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
-  const [quantity, setQuantity]         = useState(1);
-  const [activeTab, setActiveTab]       = useState('desc');
-  const [reviewForm, setReviewForm]     = useState({ rating: 5, comment: '' });
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState('desc');
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
 
   useEffect(() => {
     if (!slug) return;
@@ -46,12 +51,12 @@ export default function ProductDetailPage() {
       .then(r => {
         const data = r.data;
         // ── FIX BUG 3: đảm bảo arrays không null ──────────────────────────
-        data.images  = Array.isArray(data.images)  ? data.images  : [];
-        data.sizes   = Array.isArray(data.sizes)   ? data.sizes   : [];
-        data.colors  = Array.isArray(data.colors)  ? data.colors  : [];
+        data.images = Array.isArray(data.images) ? data.images : [];
+        data.sizes = Array.isArray(data.sizes) ? data.sizes : [];
+        data.colors = Array.isArray(data.colors) ? data.colors : [];
         data.reviews = Array.isArray(data.reviews) ? data.reviews : [];
         setProduct(data);
-        setSelectedSize(data.sizes[0]   || '');
+        setSelectedSize(data.sizes[0] || '');
         setSelectedColor(data.colors[0] || '');
       })
       .catch(err => {
@@ -150,7 +155,7 @@ export default function ProductDetailPage() {
                 src={getImageUrl(product.images[selectedImg])}
                 alt={product.name}
                 className="main-img"
-onError={e => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x600?text=No+Image'; }}
+                onError={e => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x600?text=No+Image'; }}
               />
               {discount > 0 && (
                 <span className="detail-badge badge badge-red">-{discount}%</span>
