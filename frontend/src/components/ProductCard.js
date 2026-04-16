@@ -18,7 +18,13 @@ function getImageUrl(img) {
     // Xóa các tham số cũ để tối ưu lại kích thước và định dạng
     const base = img.split('?')[0];
     return `${base}?w=800&q=80&auto=format&fit=crop`;
-  } return `https://webquanao-production.up.railway.app${img}`;
+  } 
+
+  // Nếu là link tương đối (ảnh local trên backend)
+  const backendUrl = 'https://webquanao-production.up.railway.app';
+  // Đảm bảo không có prefix trùng lặp nếu `img` đã chứa `/images/`
+  const path = img.startsWith('/images/') ? img : `/images/${img}`;
+  return `${backendUrl}${path}`;
 }
 
 export default function ProductCard({ product }) {

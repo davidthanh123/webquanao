@@ -31,7 +31,8 @@ function getImageUrl(img) {
 
   // Nếu là link tương đối (ảnh local trên backend)
   const backendUrl = 'https://webquanao-production.up.railway.app';
-  const path = img.startsWith('/') ? img : `/${img}`;
+  // Đảm bảo không có prefix trùng lặp nếu `img` đã chứa `/images/`
+  const path = img.startsWith('/images/') ? img : `/images/${img}`;
   return `${backendUrl}${path}`;
 }
 
