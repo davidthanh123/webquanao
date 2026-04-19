@@ -1,72 +1,90 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+const bcrypt = require('bcryptjs');
 const sequelize = require('../config/database');
+
 const User = require('../models/User');
-const UserAddress = require('../models/UserAddress');
 const Category = require('../models/Category');
 const Product = require('../models/Product');
-const Banner = require('../models/Banner');
-const bcrypt = require('bcryptjs');
-
-// 🟢 Nạp 1000 sản phẩm từ file JSON (images/sizes/colors/tags đã stringify sẵn)
-const productsData = require('./products_data.json');
 
 async function seed() {
-  await sequelize.sync({ force: true });
-  console.log('✅ Đã xóa trắng và tạo lại các bảng');
+    try {
+        await sequelize.sync({ force: true });
+        console.log('✅ 1. Database sạch bóng.');
 
-  // 1. Users
-  await User.bulkCreate([
-    { id: 'u1', name: 'Admin Store', email: 'admin@fashionstore.com', password: bcrypt.hashSync('admin123', 10), role: 'admin', avatar: '/images/avatars/admin.jpg' },
-    { id: 'u2', name: 'Nguyễn Văn A', email: 'user@example.com', password: bcrypt.hashSync('user123', 10), role: 'user', avatar: '/images/avatars/user.jpg' },
-  ]);
-  await UserAddress.create({ id: 'a1', userId: 'u2', name: 'Nguyễn Văn A', phone: '0901234567', address: '123 Lê Lợi, Q1, TP.HCM', isDefault: true });
-  console.log('✅ Users + Address');
+        const salt = await bcrypt.genSalt(10);
+        await User.create({ 
+            id: 'u1', name: 'Admin', email: 'admin@fashionstore.com', 
+            password: await bcrypt.hash('admin123', salt), role: 'admin' 
+        });
+        
+        await Category.bulkCreate([
+            { id: 'c1', name: 'Áo Nam', slug: 'ao-nam' },
+            { id: 'c3', name: 'Quần Nam', slug: 'quan-nam' },
+            { id: 'c15', name: 'Phụ Kiện', slug: 'phu-kien' }
+        ]);
+        console.log('✅ 2. Admin & Category OK.');
 
-  // 2. Categories — 18 danh mục khớp với products_data.json
-  await Category.bulkCreate([
-    { id: 'c1',  name: 'Áo Thun Nam',   slug: 'ao-thun-nam',  image: '/images/categories/ao-thun-nam.jpg' },
-    { id: 'c2',  name: 'Áo Sơ Mi Nam', slug: 'ao-so-mi-nam', image: '/images/categories/ao-so-mi-nam.jpg' },
-    { id: 'c3',  name: 'Quần Nam',      slug: 'quan-nam',     image: '/images/categories/quan-nam.jpg' },
-    { id: 'c4',  name: 'Áo Khoác Nam', slug: 'ao-khoac-nam', image: '/images/categories/ao-khoac-nam.jpg' },
-    { id: 'c5',  name: 'Áo Thun Nữ',   slug: 'ao-thun-nu',   image: '/images/categories/ao-thun-nu.jpg' },
-    { id: 'c6',  name: 'Áo Sơ Mi Nữ', slug: 'ao-so-mi-nu',  image: '/images/categories/ao-so-mi-nu.jpg' },
-    { id: 'c7',  name: 'Quần Nữ',      slug: 'quan-nu',      image: '/images/categories/quan-nu.jpg' },
-    { id: 'c8',  name: 'Váy',          slug: 'vay',          image: '/images/categories/vay.jpg' },
-    { id: 'c9',  name: 'Áo Khoác Nữ', slug: 'ao-khoac-nu',  image: '/images/categories/ao-khoac-nu.jpg' },
-    { id: 'c10', name: 'Đầm Nữ',       slug: 'dam-nu',       image: '/images/categories/dam-nu.jpg' },
-    { id: 'c11', name: 'Áo Trẻ Em',    slug: 'ao-tre-em',    image: '/images/categories/ao-tre-em.jpg' },
-    { id: 'c12', name: 'Quần Trẻ Em',  slug: 'quan-tre-em',  image: '/images/categories/quan-tre-em.jpg' },
-    { id: 'c13', name: 'Đầm Bé Gái',  slug: 'dam-be-gai',   image: '/images/categories/dam-be-gai.jpg' },
-    { id: 'c14', name: 'Túi Xách',     slug: 'tui-xach',     image: '/images/categories/tui-xach.jpg' },
-    { id: 'c15', name: 'Giày Nam',     slug: 'giay-nam',     image: '/images/categories/giay-nam.jpg' },
-    { id: 'c16', name: 'Giày Nữ',     slug: 'giay-nu',      image: '/images/categories/giay-nu.jpg' },
-    { id: 'c17', name: 'Phụ Kiện',     slug: 'phu-kien',     image: '/images/categories/phu-kien.jpg' },
-    { id: 'c18', name: 'Đồ Thể Thao', slug: 'do-the-thao',  image: '/images/categories/do-the-thao.jpg' },
-  ]);
-  console.log('✅ Categories (18 danh mục)');
+        const csvFilePath = path.join(__dirname, 'shopee-products.csv');
+        if (!fs.existsSync(csvFilePath)) {
+            console.log('❌ Không thấy file CSV đâu cả!');
+            return;
+        }
 
-  // 3. Products — chia batch 100 tránh timeout
-  console.log(`⏳ Đang nạp ${productsData.length} sản phẩm...`);
-  const BATCH = 100;
-  for (let i = 0; i < productsData.length; i += BATCH) {
-    await Product.bulkCreate(productsData.slice(i, i + BATCH));
-    console.log(`  → ${Math.min(i + BATCH, productsData.length)} / ${productsData.length}`);
-  }
-  console.log('✅ Products');
+        // ĐỌC FILE THEO KIỂU THÔ (RAW READING)
+        const content = fs.readFileSync(csvFilePath, 'utf8');
+        const lines = content.split(/\r?\n/); // Chia theo dòng
+        const products = [];
+        const usedImages = new Set();
 
-  // 4. Banners
-  await Banner.bulkCreate([
-    { id: 'b1', image: '/images/banners/banner1.jpg', title: 'Bộ Sưu Tập Hè 2025', subtitle: 'Giảm đến 50% toàn bộ sản phẩm', link: '/products' },
-    { id: 'b2', image: '/images/banners/banner2.jpg', title: 'Thời Trang Nữ Mới Về', subtitle: 'Phong cách - Trẻ trung - Hiện đại', link: '/products?category=ao-thun-nu' },
-    { id: 'b3', image: '/images/banners/banner3.jpg', title: 'Flash Sale Mỗi Ngày', subtitle: 'Săn deal hot lúc 12h và 20h hàng ngày', link: '/flash-sale' },
-  ]);
-  console.log('✅ Banners');
+        console.log(`⏳ Đang quét ${lines.length} dòng dữ liệu...`);
 
-  console.log('\n🎉 1000 sản phẩm đã yên vị trên MySQL Railway!');
-  process.exit(0);
+        // Bỏ qua dòng tiêu đề (i=0), chạy từ dòng 1
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line.trim()) continue;
+
+            // Tự động đoán dấu phân cách: thử phẩy (,) rồi tới chấm phẩy (;)
+            let columns = line.split(',');
+            if (columns.length < 5) columns = line.split(';');
+
+            // Theo file của bạn: Cột 2 là Title, Cột 11 là Image (vị trí index 2 và 11)
+            const title = columns[2] ? columns[2].replace(/"/g, '').trim() : '';
+            let imageUrl = columns[11] ? columns[11].replace(/[\[\]" ]/g, '').split(',')[0] : '';
+
+            if (title && imageUrl && imageUrl.startsWith('http') && !usedImages.has(imageUrl)) {
+                usedImages.add(imageUrl);
+                
+                let catId = 'c15';
+                if (title.toLowerCase().includes('áo')) catId = 'c1';
+                if (title.toLowerCase().includes('quần')) catId = 'c3';
+
+                products.push({
+                    id: 'p' + Math.random().toString(36).substr(2, 9),
+                    name: title.substring(0, 150),
+                    slug: 'sp-' + Date.now() + i,
+                    categoryId: catId,
+                    price: 150000,
+                    stock: 100,
+                    images: JSON.stringify([imageUrl]),
+                    sizes: JSON.stringify(["M", "L", "XL"]),
+                    colors: JSON.stringify(["Đen", "Trắng"]),
+                });
+            }
+        }
+
+        if (products.length > 0) {
+            await Product.bulkCreate(products.slice(0, 100));
+            console.log(`🚀 THÀNH CÔNG RỒI! Đã nạp ${products.length} sản phẩm.`);
+        } else {
+            console.log('❌ Vẫn bằng 0. Có vẻ file CSV bị lỗi Encoding hoặc trống dữ liệu.');
+        }
+        process.exit(0);
+
+    } catch (error) {
+        console.error('❌ Lỗi:', error);
+        process.exit(1);
+    }
 }
-
-seed().catch(err => {
-  console.error('❌ Lỗi seed:', err.message || err);
-  process.exit(1);
-});
+seed();

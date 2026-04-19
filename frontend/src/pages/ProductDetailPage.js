@@ -16,13 +16,9 @@ const formatPrice = (p) =>
 // Nếu là path tương đối (/images/...) → prefix localhost
 function getImageUrl(img) {
   if (!img) return 'https://placehold.co/600x600?text=No+Image';
-  
-  // Nếu là link Unsplash
-  if (img.includes('unsplash.com')) {
-    // Xóa các tham số cũ để tối ưu lại kích thước và định dạng
-    const base = img.split('?')[0];
-    return `${base}?w=800&q=80&auto=format&fit=crop`;
-  }
+  if (img.startsWith('http://') || img.startsWith('https://')) return img;
+  return `https://webquanao-production.up.railway.app/images/${img}`;
+}
 
   // Nếu là link tuyệt đối (http/https) khác
   if (img.startsWith('http://') || img.startsWith('https://')) {
@@ -34,7 +30,7 @@ function getImageUrl(img) {
   // Đảm bảo không có prefix trùng lặp nếu `img` đã chứa `/images/`
   const path = img.startsWith('/images/') ? img : `/images/${img}`;
   return `${backendUrl}${path}`;
-}
+
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
