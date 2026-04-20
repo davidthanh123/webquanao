@@ -70,7 +70,7 @@ export default function OrdersPage() {
                         {order.items.map((item, i) => (
                           <div key={i} className="order-item">
                             {/* 📷 ẢNH SẢN PHẨM TRONG ĐƠN: 64x64px */}
-                            <img src={item.image ? `http://localhost:5000${item.image}` : '/images/placeholder.jpg'} alt={item.productName} />
+                            <img src={item.image ? `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.image}` : '/images/placeholder.jpg'} alt={item.productName} />
                             <div style={{ flex: 1 }}>
                               <p className="item-name">{item.productName}</p>
                               <p className="item-variant">{item.color} / {item.size} × {item.quantity}</p>

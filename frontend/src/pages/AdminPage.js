@@ -142,7 +142,7 @@ export default function AdminPage() {
                     <tr key={p.id}>
                       <td>
                         {/* 📷 ẢNH SẢN PHẨM TRONG ADMIN: 50x50px */}
-                        <img src={p.images?.[0] ? `http://localhost:5000${p.images[0]}` : '/images/placeholder.jpg'} alt={p.name} style={{ width:50, height:50, objectFit:'cover', borderRadius:6 }} />
+                        <img src={p.images?.[0] ? `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${p.images[0]}` : '/images/placeholder.jpg'} alt={p.name} style={{ width:50, height:50, objectFit:'cover', borderRadius:6 }} />
                       </td>
                       <td><strong>{p.name}</strong></td>
                       <td className="price-current">{formatPrice(p.price)}</td>
@@ -217,7 +217,7 @@ export default function AdminPage() {
                   <tr key={u.id}>
                     <td>
                       {/* 📷 AVATAR ADMIN TABLE: 40x40px */}
-                      {u.avatar ? <img src={`http://localhost:5000${u.avatar}`} alt={u.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover' }} />
+                      {u.avatar ? <img src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${u.avatar}`} alt={u.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover' }} />
                         : <div style={{ width:40,height:40,borderRadius:'50%',background:'var(--primary)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:700 }}>{u.name?.[0]}</div>}
                     </td>
                     <td><strong>{u.name}</strong></td>

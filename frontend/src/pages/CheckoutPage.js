@@ -92,7 +92,7 @@ export default function CheckoutPage() {
                 <div key={`${item.productId}-${item.size}`} className="checkout-item">
                   <div className="checkout-item-img-wrapper">
                     {/* 📷 ẢNH SẢN PHẨM KHI CHECKOUT: 60x60px */}
-                    <img src={item.product?.images?.[0] ? `http://localhost:5000${item.product.images[0]}` : '/images/placeholder.jpg'} alt={item.product?.name} />
+                    <img src={item.product?.images?.[0] ? `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.product.images[0]}` : '/images/placeholder.jpg'} alt={item.product?.name} />
                     <span className="item-qty-badge">{item.quantity}</span>
                   </div>
                   <div style={{ flex: 1 }}>

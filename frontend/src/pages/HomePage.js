@@ -41,7 +41,7 @@ export default function HomePage() {
           {banners.length > 0 ? banners.map((b, i) => (
             <div key={b.id} className={`banner-slide ${i === bannerIdx ? 'active' : ''}`}>
               {/* 📷 BANNER: Ảnh banner lớn (1200x400px) - đặt trong /public/images/banners/ */}
-              <img src={`http://localhost:5000${b.image}`} alt={b.title} className="banner-img" />
+              <img src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${b.image}`} alt={b.title} className="banner-img" />
               <div className="banner-overlay">
                 <h2>{b.title}</h2>
                 <p>{b.subtitle}</p>
@@ -88,7 +88,7 @@ export default function HomePage() {
               <Link key={cat.id} to={`/products?category=${cat.slug}`} className="category-card">
                 {/* 📷 ẢNH DANH MỤC: 200x200px - đặt trong /public/images/categories/ */}
                 <img
-                  src={`http://localhost:5000${cat.image}`}
+                  src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${cat.image}`}
                   alt={cat.name}
                   className="category-img"
                   onError={e => { e.target.style.display='none'; }}
@@ -133,14 +133,14 @@ export default function HomePage() {
         <div className="container mid-banner-grid">
           {/* 📷 BANNER QUẢNG CÁO TRÁI: 580x200px - đặt trong /public/images/banners/mid-banner-left.jpg */}
           <Link to="/products?category=ao-nu" className="mid-banner">
-            <img src="http://localhost:5000/images/banners/mid-banner-left.jpg" alt="Thời trang nữ"
+            <img src="${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/images/banners/mid-banner-left.jpg" alt="Thời trang nữ"
               onError={e => { e.target.parentElement.style.background='linear-gradient(135deg,#f093fb,#f5576c)'; e.target.style.display='none'; }}
             />
             <div className="mid-banner-text"><h3>Thời Trang Nữ</h3><p>Mới về mỗi ngày</p></div>
           </Link>
           {/* 📷 BANNER QUẢNG CÁO PHẢI: 580x200px - đặt trong /public/images/banners/mid-banner-right.jpg */}
           <Link to="/products?category=ao-nam" className="mid-banner">
-            <img src="http://localhost:5000/images/banners/mid-banner-right.jpg" alt="Thời trang nam"
+            <img src="${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/images/banners/mid-banner-right.jpg" alt="Thời trang nam"
               onError={e => { e.target.parentElement.style.background='linear-gradient(135deg,#4facfe,#00f2fe)'; e.target.style.display='none'; }}
             />
             <div className="mid-banner-text"><h3>Thời Trang Nam</h3><p>Phong cách lịch lãm</p></div>

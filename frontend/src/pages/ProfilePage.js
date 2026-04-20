@@ -31,7 +31,7 @@ export default function ProfilePage() {
           <div className="profile-avatar-card">
             <div className="avatar-wrapper">
               {user?.avatar
-                ? <img src={`http://localhost:5000${user.avatar}`} alt={user.name} className="profile-avatar-img" />
+                ? <img src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${user.avatar}`} alt={user.name} className="profile-avatar-img" />
                 /* 📷 AVATAR USER: 120x120px - hiển thị trong trang profile */
                 : <div className="avatar-placeholder"><User size={50} /></div>
               }

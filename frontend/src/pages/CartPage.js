@@ -39,7 +39,7 @@ export default function CartPage() {
               <div key={`${item.productId}-${item.size}-${item.color}`} className="cart-item">
                 {/* 📷 ẢNH SẢN PHẨM TRONG GIỎ: 80x80px - thumbnail */}
                 <img
-                  src={item.product?.images?.[0] ? `http://localhost:5000${item.product.images[0]}` : '/images/placeholder.jpg'}
+                  src={item.product?.images?.[0] ? `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.product.images[0]}` : '/images/placeholder.jpg'}
                   alt={item.product?.name}
                   className="cart-item-img"
                 />

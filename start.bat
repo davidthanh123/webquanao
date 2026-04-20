@@ -13,7 +13,7 @@ start "Frontend" cmd /k "cd /d D:\DAVID2\webquanao\frontend && npm start"
 
 echo.
 echo ========================================
-echo  Backend:  http://localhost:5000
+echo  Backend:  ${process.env.REACT_APP_API_URL || 'http://localhost:5000'}
 echo  Frontend: http://localhost:3000
 echo ========================================
 echo.
