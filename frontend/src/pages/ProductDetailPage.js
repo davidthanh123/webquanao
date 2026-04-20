@@ -1,7 +1,7 @@
-// src/pages/ProductDetailPage.jsx  ← đổi extension thành .jsx cho nhất quán
+// src/pages/ProductDetailPage.js
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Star, ShoppingCart, Heart, Share2, ChevronRight, Minus, Plus } from 'lucide-react';
+import { Star, ShoppingCart, Heart, ChevronRight, Minus, Plus } from 'lucide-react';
 import { getProduct, addReview } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -11,26 +11,13 @@ import './ProductDetailPage.css';
 const formatPrice = (p) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
 
-// ── FIX BUG 2: Helper lấy URL ảnh đúng ──────────────────────────────────────
-// Nếu img đã là URL đầy đủ (http/https) → dùng thẳng
-// Nếu là path tương đối (/images/...) → prefix localhost
 function getImageUrl(img) {
   if (!img) return 'https://placehold.co/600x600?text=No+Image';
   if (img.startsWith('http://') || img.startsWith('https://')) return img;
-  return `https://webquanao-production.up.railway.app/images/${img}`;
-}
-
-  // Nếu là link tuyệt đối (http/https) khác
-  if (img.startsWith('http://') || img.startsWith('https://')) {
-    return img;
-  }
-
-  // Nếu là link tương đối (ảnh local trên backend)
-  const backendUrl = 'https://webquanao-production.up.railway.app';
-  // Đảm bảo không có prefix trùng lặp nếu `img` đã chứa `/images/`
+  const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   const path = img.startsWith('/images/') ? img : `/images/${img}`;
   return `${backendUrl}${path}`;
-
+}
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -40,7 +27,7 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);          // ← FIX BUG 3: track lỗi
+  const [error, setError] = useState(null);
   const [selectedImg, setSelectedImg] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
@@ -57,7 +44,6 @@ export default function ProductDetailPage() {
     getProduct(slug)
       .then(r => {
         const data = r.data;
-        // ── FIX BUG 3: đảm bảo arrays không null ──────────────────────────
         data.images = Array.isArray(data.images) ? data.images : [];
         data.sizes = Array.isArray(data.sizes) ? data.sizes : [];
         data.colors = Array.isArray(data.colors) ? data.colors : [];
@@ -103,7 +89,6 @@ export default function ProductDetailPage() {
     }
   };
 
-  // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
@@ -113,7 +98,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  // ── FIX BUG 3: Hiển thị lỗi rõ ràng thay vì trang trống ──────────────────
   if (error) {
     return (
       <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
@@ -142,7 +126,6 @@ export default function ProductDetailPage() {
   return (
     <div className="product-detail-page">
       <div className="container">
-        {/* Breadcrumb */}
         <nav className="breadcrumb">
           <Link to="/">Trang chủ</Link><ChevronRight size={14} />
           <Link to="/products">Sản phẩm</Link><ChevronRight size={14} />
@@ -152,12 +135,9 @@ export default function ProductDetailPage() {
           <span>{product.name}</span>
         </nav>
 
-        {/* Main */}
         <div className="detail-main">
-          {/* Images */}
           <div className="detail-images">
             <div className="main-img-wrapper">
-              {/* ── FIX BUG 2: dùng getImageUrl thay vì prefix cứng ── */}
               <img
                 src={getImageUrl(product.images[selectedImg])}
                 alt={product.name}
@@ -176,7 +156,6 @@ export default function ProductDetailPage() {
                     className={`thumb-btn ${i === selectedImg ? 'active' : ''}`}
                     onClick={() => setSelectedImg(i)}
                   >
-                    {/* ── FIX BUG 2: dùng getImageUrl ── */}
                     <img
                       src={getImageUrl(img)}
                       alt={`Ảnh ${i + 1}`}
@@ -188,7 +167,6 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Info */}
           <div className="detail-info">
             <h1 className="detail-name">{product.name}</h1>
             <div className="detail-meta">
@@ -215,7 +193,6 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {/* Colors */}
             {product.colors.length > 0 && (
               <div className="option-group">
                 <label>Màu sắc: <strong>{selectedColor}</strong></label>
@@ -233,7 +210,6 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Sizes */}
             {product.sizes.length > 0 && (
               <div className="option-group">
                 <label>Kích cỡ: <strong>{selectedSize}</strong></label>
@@ -251,7 +227,6 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Quantity */}
             <div className="option-group">
               <label>Số lượng:</label>
               <div className="quantity-control">
@@ -266,7 +241,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="detail-actions">
               <button className="btn-outline" style={{ flex: 1 }} onClick={handleAddToCart}>
                 <ShoppingCart size={18} /> Thêm vào giỏ
@@ -277,7 +251,6 @@ export default function ProductDetailPage() {
               <button className="btn-ghost wishlist-btn"><Heart size={20} /></button>
             </div>
 
-            {/* Shipping info */}
             <div className="shipping-info">
               <p>🚚 Miễn phí vận chuyển cho đơn từ <strong>500.000đ</strong></p>
               <p>🔄 Đổi trả trong <strong>30 ngày</strong> nếu có lỗi từ nhà sản xuất</p>
@@ -286,7 +259,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="detail-tabs">
           <div className="tab-buttons">
             {[
@@ -312,7 +284,6 @@ export default function ProductDetailPage() {
 
             {activeTab === 'reviews' && (
               <div className="reviews-section">
-                {/* Review form */}
                 <div className="review-form-wrapper">
                   <h4>Viết đánh giá</h4>
                   <form onSubmit={handleReview}>
@@ -341,7 +312,6 @@ export default function ProductDetailPage() {
                   </form>
                 </div>
 
-                {/* Reviews list */}
                 {product.reviews.length === 0 ? (
                   <p style={{ color: 'var(--text-light)', padding: '20px 0' }}>
                     Chưa có đánh giá nào
