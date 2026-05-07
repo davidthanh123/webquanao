@@ -23,9 +23,13 @@ Product.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
 Review.belongsTo(User,      { foreignKey: 'userId',     as: 'user' });
 User.hasMany(UserAddress,   { foreignKey: 'userId',     as: 'addresses' });
 
-// Kết nối MySQL
+// Kết nối MySQL và tạo bảng nếu chưa có
 sequelize.authenticate()
-  .then(() => console.log('✅ Kết nối MySQL thành công!'))
+  .then(() => {
+    console.log('✅ Kết nối MySQL thành công!');
+    return sequelize.sync({ alter: false }); // Tạo bảng nếu chưa có, không xóa data cũ
+  })
+  .then(() => console.log('✅ Sync bảng thành công!'))
   .catch(err => console.error('❌ Lỗi kết nối MySQL:', err));
 // ==========================================
 
