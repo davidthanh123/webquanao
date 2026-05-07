@@ -13,6 +13,12 @@ const formatPrice = (p) =>
 function getImageUrl(img) {
   if (!img) return 'https://placehold.co/600x600?text=No+Image';
   
+  // Nếu là link Shopee → proxy qua backend để tránh bị chặn hotlink
+  if (img.includes('susercontent.com') || img.includes('shopee')) {
+    const backendUrl = 'https://webquanao-pe7a.onrender.com';
+    return `${backendUrl}/api/proxy-image?url=${encodeURIComponent(img)}`;
+  }
+
   // Nếu đã là URL đầy đủ (http/https) thì dùng thẳng
   if (img.startsWith('http://') || img.startsWith('https://')) {
     return img;

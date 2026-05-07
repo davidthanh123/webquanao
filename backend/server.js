@@ -69,6 +69,23 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/banners', bannerRoutes);
 
+// Proxy ảnh Shopee để tránh hotlink block
+const https = require('https');
+const http = require('http');
+app.get('/api/proxy-image', (req, res) => {
+  const imageUrl = req.query.url;
+  if (!imageUrl) return res.status(400).send('Missing url');
+  
+  const protocol = imageUrl.startsWith('https') ? https : http;
+  protocol.get(imageUrl, { 
+    headers: { 'Referer': 'https://shopee.vn', 'User-Agent': 'Mozilla/5.0' }
+  }, (imgRes) => {
+    res.setHeader('Content-Type', imgRes.headers['content-type'] || 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    imgRes.pipe(res);
+  }).on('error', () => res.status(404).send('Image not found'));
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Fashion Store API đang chạy!' });
