@@ -167,6 +167,7 @@ export default function Navbar() {
 <div className="nav-dropdown-wrap">
   <span className="nav-cat-trigger">
     <Link to="/products?category=phu-kien-cha" className="nav-cat-label">
+
       Phụ Kiện
     </Link>
     <ChevronDown size={12} className="nav-cat-arrow" />

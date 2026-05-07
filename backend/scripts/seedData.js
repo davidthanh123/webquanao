@@ -4,7 +4,15 @@ const sequelize = require('../config/database');
 const User = require('../models/User');
 const Category = require('../models/Category');
 const Product = require('../models/Product');
-const productsData = require('./products_clean.json');
+// Dùng products_vi.json nếu có (tên tiếng Việt), fallback về products_clean.json
+let productsData;
+try {
+  productsData = require('./products_vi.json');
+  console.log('📦 Dùng products_vi.json (tên tiếng Việt)');
+} catch (e) {
+  productsData = require('./products_clean.json');
+  console.warn('⚠️  products_vi.json chưa có, dùng products_clean.json. Chạy generateVietnameseNames.js trước!');
+}
 
 // Khớp đúng 18 slugs frontend đang expect
 const CATEGORIES = [

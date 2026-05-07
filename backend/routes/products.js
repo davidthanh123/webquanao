@@ -50,29 +50,31 @@ router.get('/', async (req, res) => {
     const where = {};
 
     if (category) {
-  const cat = await Category.findOne({
-    where: { [Op.or]: [{ slug: category }, { id: category }] }
-  });
-  if (!cat) return res.json({ products: [], total: 0, page, totalPages: 0 });
-
   // Map category cha → các slug con
+  // Hỗ trợ cả slug cha (ao-nam, vay-dam, phu-kien-cha...) lẫn slug lá (ao-thun-nam...)
   const childrenMap = {
-    'ao-nam':    ['ao-thun-nam', 'ao-so-mi-nam', 'ao-khoac-nam'],
-    'quan-nam':  ['quan-nam'],
-    'ao-nu':     ['ao-thun-nu', 'ao-so-mi-nu', 'ao-khoac-nu', 'dam-nu'],
-    'vay-dam':   ['vay', 'dam-nu'],
-    'phu-kien':  ['tui-xach', 'giay-nam', 'giay-nu', 'phu-kien'],
-    'the-thao':  ['do-the-thao'],
-    'tre-em':    ['ao-tre-em', 'quan-tre-em', 'dam-be-gai'],
+    'ao-nam':       ['ao-thun-nam', 'ao-so-mi-nam', 'ao-khoac-nam'],
+    'quan-nam-cha': ['quan-nam'],
+    'ao-nu':        ['ao-thun-nu', 'ao-so-mi-nu', 'ao-khoac-nu', 'dam-nu'],
+    'vay-dam':      ['vay', 'dam-nu'],
+    'phu-kien-cha': ['tui-xach', 'giay-nam', 'giay-nu', 'phu-kien'],
+    'the-thao':     ['do-the-thao'],
+    'tre-em':       ['ao-tre-em', 'quan-tre-em', 'dam-be-gai'],
   };
 
-  if (childrenMap[cat.slug]) {
+  if (childrenMap[category]) {
+    // Slug cha: tìm tất cả category con theo slug list
     const childCats = await Category.findAll({
-      where: { slug: { [Op.in]: childrenMap[cat.slug] } }
+      where: { slug: { [Op.in]: childrenMap[category] } }
     });
-    const childIds = childCats.map(c => c.id);
-    where.categoryId = { [Op.in]: childIds };
+    if (childCats.length === 0) return res.json({ products: [], total: 0, page, totalPages: 0 });
+    where.categoryId = { [Op.in]: childCats.map(c => c.id) };
   } else {
+    // Slug lá: tìm đúng 1 category
+    const cat = await Category.findOne({
+      where: { [Op.or]: [{ slug: category }, { id: category }] }
+    });
+    if (!cat) return res.json({ products: [], total: 0, page, totalPages: 0 });
     where.categoryId = cat.id;
   }
 }
