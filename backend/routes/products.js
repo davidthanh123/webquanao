@@ -57,11 +57,13 @@ router.get('/', async (req, res) => {
 
   // Map category cha → các slug con
   const childrenMap = {
-    'ao-nam':       ['ao-thun-nam', 'ao-so-mi-nam', 'ao-khoac-nam'],
-    'ao-nu':        ['ao-thun-nu',  'ao-so-mi-nu',  'ao-khoac-nu'],
-    'vay-dam':      ['quan-nu', 'vay', 'dam-nu'],
-    'quan-nam-cha': ['quan-nam'],
-    'phu-kien-cha': ['tui-xach', 'giay-nam', 'giay-nu', 'phu-kien'],
+    'ao-nam':    ['ao-thun-nam', 'ao-so-mi-nam', 'ao-khoac-nam'],
+    'quan-nam':  ['quan-nam'],
+    'ao-nu':     ['ao-thun-nu', 'ao-so-mi-nu', 'ao-khoac-nu', 'dam-nu'],
+    'vay-dam':   ['vay', 'dam-nu'],
+    'phu-kien':  ['tui-xach', 'giay-nam', 'giay-nu', 'phu-kien'],
+    'the-thao':  ['do-the-thao'],
+    'tre-em':    ['ao-tre-em', 'quan-tre-em', 'dam-be-gai'],
   };
 
   if (childrenMap[cat.slug]) {
