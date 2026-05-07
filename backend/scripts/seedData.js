@@ -10,7 +10,9 @@ const Product = require('../models/Product');
 
 async function seed() {
     try {
+        await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
         await sequelize.sync({ force: true });
+        await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
         console.log('✅ 1. Database sạch bóng.');
 
         const salt = await bcrypt.genSalt(10);

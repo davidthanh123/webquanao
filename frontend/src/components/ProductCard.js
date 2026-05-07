@@ -13,16 +13,13 @@ const formatPrice = (p) =>
 function getImageUrl(img) {
   if (!img) return 'https://placehold.co/600x600?text=No+Image';
   
-  // Nếu là link Unsplash
-  if (img.includes('unsplash.com')) {
-    // Xóa các tham số cũ để tối ưu lại kích thước và định dạng
-    const base = img.split('?')[0];
-    return `${base}?w=800&q=80&auto=format&fit=crop`;
-  } 
+  // Nếu đã là URL đầy đủ (http/https) thì dùng thẳng
+  if (img.startsWith('http://') || img.startsWith('https://')) {
+    return img;
+  }
 
   // Nếu là link tương đối (ảnh local trên backend)
   const backendUrl = 'https://webquanao-pe7a.onrender.com';
-  // Đảm bảo không có prefix trùng lặp nếu `img` đã chứa `/images/`
   const path = img.startsWith('/images/') ? img : `/images/${img}`;
   return `${backendUrl}${path}`;
 }
