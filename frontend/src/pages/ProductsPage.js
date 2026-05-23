@@ -1,11 +1,12 @@
 // src/pages/ProductsPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { SlidersHorizontal, X, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react';
 import { getProducts, getCategories } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import './ProductsPage.css';
 
+// ── Pagination ────────────────────────────────────────────────────────────────
 function Pagination({ page, totalPages, onChange }) {
   if (totalPages <= 1) return null;
   const delta = 2;
@@ -34,43 +35,56 @@ function Pagination({ page, totalPages, onChange }) {
   );
 }
 
-// ── 18 slugs chính xác từ DB Railway ─────────────────────────────────────────
-// Page1: c1=ao-thun-nam, c10=dam-nu, c11=ao-tre-em, c12=quan-tre-em, c13=dam-be-gai
-// Page2: c14=tui-xach, c15=giay-nam, c16=giay-nu, c17=phu-kien, c18=do-the-thao
-// Page3: c2=ao-so-mi-nam, c3=quan-nam, c4=ao-khoac-nam, c5=ao-thun-nu, c6=ao-so-mi-nu
-// Page4: c7=quan-nu, c8=vay, c9=ao-khoac-nu
+// ── Accordion section trong sidebar ──────────────────────────────────────────
+function FilterSection({ title, defaultOpen = true, children }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className={`fs-section ${open ? 'open' : ''}`}>
+      <button className="fs-section-header" onClick={() => setOpen(o => !o)}>
+        <span>{title}</span>
+        <ChevronDown size={15} className="fs-chevron" />
+      </button>
+      <div className="fs-section-body">
+        <div className="fs-section-inner">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── 18 slugs khớp với DB ──────────────────────────────────────────────────────
 const CAT_GROUPS = [
-  {
-    label: 'Nam',
-    slugs: ['ao-thun-nam', 'ao-so-mi-nam', 'quan-nam', 'ao-khoac-nam'],
-  },
-  {
-    label: 'Nữ',
-    slugs: ['ao-thun-nu', 'ao-so-mi-nu', 'quan-nu', 'vay', 'ao-khoac-nu', 'dam-nu'],
-  },
-  {
-    label: 'Trẻ em',
-    slugs: ['ao-tre-em', 'quan-tre-em', 'dam-be-gai'],
-  },
-  {
-    label: 'Phụ kiện',
-    slugs: ['tui-xach', 'giay-nam', 'giay-nu', 'phu-kien'],
-  },
-  {
-    label: 'Thể thao',
-    slugs: ['do-the-thao'],
-  },
+  { label: 'Nam',      slugs: ['ao-thun-nam', 'ao-so-mi-nam', 'quan-nam', 'ao-khoac-nam'] },
+  { label: 'Nữ',       slugs: ['ao-thun-nu', 'ao-so-mi-nu', 'quan-nu', 'vay', 'ao-khoac-nu', 'dam-nu'] },
+  { label: 'Trẻ em',   slugs: ['ao-tre-em', 'quan-tre-em', 'dam-be-gai'] },
+  { label: 'Phụ kiện', slugs: ['tui-xach', 'giay-nam', 'giay-nu', 'phu-kien'] },
+  { label: 'Thể thao', slugs: ['do-the-thao'] },
 ];
 
+const PRICE_RANGES = [
+  { label: 'Tất cả',   min: '',       max: '' },
+  { label: 'Dưới 200K', min: '0',     max: '200000' },
+  { label: '200K – 500K', min: '200000', max: '500000' },
+  { label: '500K – 1tr', min: '500000', max: '1000000' },
+  { label: 'Trên 1tr', min: '1000000', max: '' },
+];
+
+const TAG_OPTIONS = [
+  { value: '',           label: 'Tất cả' },
+  { value: 'sale',       label: '🔥 Đang sale' },
+  { value: 'new',        label: '✨ Mới về' },
+  { value: 'bestseller', label: '⭐ Bán chạy' },
+];
+
+// ── Main Page ────────────────────────────────────────────────────────────────
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [products, setProducts]         = useState([]);
-  const [categories, setCategories]     = useState([]);
-  const [totalPages, setTotalPages]     = useState(1);
-  const [total, setTotal]               = useState(0);
-  const [loading, setLoading]           = useState(true);
-  const [showFilter, setShowFilter]     = useState(false);
-  const [fetchError, setFetchError]     = useState(null);
+  const [products, setProducts]   = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal]         = useState(0);
+  const [loading, setLoading]     = useState(true);
+  const [showFilter, setShowFilter] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
 
   const category = searchParams.get('category') || '';
   const search   = searchParams.get('search')   || '';
@@ -110,21 +124,21 @@ export default function ProductsPage() {
       .finally(() => setLoading(false));
   }, [category, search, sort, tag, page, minPrice, maxPrice]);
 
-  const setParam = (key, val) => {
+  const setParam = useCallback((key, val) => {
     const p = new URLSearchParams(searchParams);
     if (val) p.set(key, val); else p.delete(key);
     p.delete('page');
     setSearchParams(p);
-  };
+  }, [searchParams, setSearchParams]);
 
-  const setParams = (kvPairs) => {
+  const setParams = useCallback((kvPairs) => {
     const p = new URLSearchParams(searchParams);
     kvPairs.forEach(([key, val]) => {
       if (val) p.set(key, val); else p.delete(key);
     });
     p.delete('page');
     setSearchParams(p);
-  };
+  }, [searchParams, setSearchParams]);
 
   const clearFilters = () => setSearchParams({});
 
@@ -144,120 +158,165 @@ export default function ProductsPage() {
       ? (categories.find(c => c.slug === category)?.name || 'Sản phẩm')
       : 'Tất Cả Sản Phẩm';
 
+  // Active price label
+  const activePriceLabel = PRICE_RANGES.find(r => r.min === minPrice && r.max === maxPrice)?.label || 'Tất cả';
+
   return (
     <div className="products-page">
       <div className="container">
+
+        {/* ── Header ── */}
         <div className="products-header">
-          <div>
+          <div className="products-header-left">
             <h1 className="products-title">{pageTitle}</h1>
-            {!loading && <p className="products-count">{total.toLocaleString()} sản phẩm</p>}
+            {!loading && (
+              <p className="products-count">
+                {total.toLocaleString()} sản phẩm
+              </p>
+            )}
           </div>
           <div className="products-toolbar">
-            <button className="filter-toggle-btn" onClick={() => setShowFilter(!showFilter)}>
+            <button
+              className={`filter-toggle-btn ${showFilter ? 'active' : ''}`}
+              onClick={() => setShowFilter(!showFilter)}
+            >
               <SlidersHorizontal size={15} />
               Bộ lọc
-              {activeCount > 0 && <span className="filter-count">{activeCount}</span>}
+              {activeCount > 0 && <span className="filter-badge">{activeCount}</span>}
             </button>
-            <select className="sort-select" value={sort} onChange={e => setParam('sort', e.target.value)}>
-              <option value="newest">Mới nhất</option>
-              <option value="bestseller">Bán chạy</option>
-              <option value="rating">Đánh giá cao</option>
-              <option value="price_asc">Giá thấp → cao</option>
-              <option value="price_desc">Giá cao → thấp</option>
-            </select>
+            <div className="sort-wrapper">
+              <select
+                className="sort-select"
+                value={sort}
+                onChange={e => setParam('sort', e.target.value)}
+              >
+                <option value="newest">Mới nhất</option>
+                <option value="bestseller">Bán chạy nhất</option>
+                <option value="rating">Đánh giá cao</option>
+                <option value="price_asc">Giá: Thấp → Cao</option>
+                <option value="price_desc">Giá: Cao → Thấp</option>
+              </select>
+            </div>
           </div>
         </div>
 
+        {/* ── Active filter chips ── */}
+        {activeCount > 0 && (
+          <div className="active-filters">
+            {category && (
+              <span className="active-chip">
+                {categories.find(c => c.slug === category)?.name || category}
+                <button onClick={() => setParam('category', '')}><X size={11} /></button>
+              </span>
+            )}
+            {(minPrice || maxPrice) && (
+              <span className="active-chip">
+                {activePriceLabel}
+                <button onClick={() => setParams([['minPrice', ''], ['maxPrice', '']])}><X size={11} /></button>
+              </span>
+            )}
+            {tag && (
+              <span className="active-chip">
+                {TAG_OPTIONS.find(t => t.value === tag)?.label || tag}
+                <button onClick={() => setParam('tag', '')}><X size={11} /></button>
+              </span>
+            )}
+            <button className="clear-all-btn" onClick={clearFilters}>Xóa tất cả</button>
+          </div>
+        )}
+
         <div className="products-layout">
+
+          {/* ── Sidebar overlay (mobile) ── */}
+          {showFilter && <div className="sidebar-overlay" onClick={() => setShowFilter(false)} />}
+
           {/* ── Sidebar ── */}
           <aside className={`filter-sidebar ${showFilter ? 'open' : ''}`}>
-            <div className="filter-header">
-              <h3>Bộ lọc</h3>
-              <button onClick={() => setShowFilter(false)}><X size={18} /></button>
+            <div className="fs-header">
+              <span className="fs-title">
+                Bộ lọc
+                {activeCount > 0 && <em>{activeCount} đang dùng</em>}
+              </span>
+              <button className="fs-close-btn" onClick={() => setShowFilter(false)}>
+                <X size={16} />
+              </button>
             </div>
 
-            {activeCount > 0 && (
-              <button className="clear-filter-btn" onClick={clearFilters}>
-                <X size={13} /> Xóa bộ lọc
-              </button>
-            )}
-
-            {/* Danh mục — slugs khớp 100% với DB */}
-            <div className="filter-group">
-              <h4>Danh mục</h4>
+            {/* Danh mục */}
+            <FilterSection title="Danh mục" defaultOpen={true}>
               <button
-                className={`filter-option ${!category ? 'active' : ''}`}
+                className={`fs-cat-all ${!category ? 'active' : ''}`}
                 onClick={() => setParam('category', '')}
               >
-                Tất cả
+                Tất cả sản phẩm
               </button>
-
               {CAT_GROUPS.map(group => {
                 const groupCats = categories.filter(c => group.slugs.includes(c.slug));
-                // Fallback: nếu categories API chưa load xong, render từ slugs hardcode
                 const items = groupCats.length > 0
                   ? groupCats
                   : group.slugs.map(s => ({
-                      slug: s,
-                      id: s,
+                      slug: s, id: s,
                       name: s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
                     }));
-
                 return (
-                  <div key={group.label} className="cat-group">
-                    <span className="cat-group-label">{group.label}</span>
+                  <div key={group.label} className="fs-cat-group">
+                    <span className="fs-cat-group-label">{group.label}</span>
                     {items.map(c => (
                       <button
                         key={c.slug}
-                        className={`filter-option filter-option-sub ${category === c.slug ? 'active' : ''}`}
+                        className={`fs-cat-item ${category === c.slug ? 'active' : ''}`}
                         onClick={() => setParam('category', c.slug)}
                       >
+                        <span className="fs-cat-dot" />
                         {c.name}
+                        {category === c.slug && <span className="fs-cat-check">✓</span>}
                       </button>
                     ))}
                   </div>
                 );
               })}
-            </div>
+            </FilterSection>
+
+            <div className="fs-divider" />
 
             {/* Khoảng giá */}
-            <div className="filter-group">
-              <h4>Khoảng giá</h4>
-              {[
-                ['', '',          'Tất cả'],
-                ['0', '200000',   'Dưới 200K'],
-                ['200000', '500000',  '200K – 500K'],
-                ['500000', '1000000', '500K – 1tr'],
-                ['1000000', '',   'Trên 1tr'],
-              ].map(([min, max, label]) => (
-                <button
-                  key={label}
-                  className={`filter-option ${minPrice === min && maxPrice === max ? 'active' : ''}`}
-                  onClick={() => setParams([['minPrice', min], ['maxPrice', max]])}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <FilterSection title="Khoảng giá" defaultOpen={true}>
+              <div className="fs-price-chips">
+                {PRICE_RANGES.map(({ label, min, max }) => (
+                  <button
+                    key={label}
+                    className={`fs-price-chip ${minPrice === min && maxPrice === max ? 'active' : ''}`}
+                    onClick={() => setParams([['minPrice', min], ['maxPrice', max]])}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </FilterSection>
 
-            {/* Tags */}
-            <div className="filter-group">
-              <h4>Loại sản phẩm</h4>
-              {[
-                ['', 'Tất cả'],
-                ['sale', '🔥 Đang sale'],
-                ['new', '✨ Mới về'],
-                ['bestseller', '⭐ Bán chạy'],
-              ].map(([t, label]) => (
-                <button
-                  key={label}
-                  className={`filter-option ${tag === t ? 'active' : ''}`}
-                  onClick={() => setParam('tag', t)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <div className="fs-divider" />
+
+            {/* Loại sản phẩm */}
+            <FilterSection title="Loại sản phẩm" defaultOpen={true}>
+              <div className="fs-tag-list">
+                {TAG_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    className={`fs-tag-item ${tag === value ? 'active' : ''}`}
+                    onClick={() => setParam('tag', value)}
+                  >
+                    {label}
+                    {tag === value && <span className="fs-cat-check">✓</span>}
+                  </button>
+                ))}
+              </div>
+            </FilterSection>
+
+            {activeCount > 0 && (
+              <button className="fs-clear-btn" onClick={clearFilters}>
+                <X size={13} /> Xóa bộ lọc ({activeCount})
+              </button>
+            )}
           </aside>
 
           {/* ── Products ── */}
@@ -265,7 +324,7 @@ export default function ProductsPage() {
             {loading ? (
               <div className="product-grid">
                 {Array.from({ length: 20 }).map((_, i) => (
-                  <div key={i} className="product-skeleton" />
+                  <div key={i} className="product-skeleton" style={{ animationDelay: `${i * 0.04}s` }} />
                 ))}
               </div>
             ) : fetchError ? (
