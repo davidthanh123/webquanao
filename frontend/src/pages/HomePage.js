@@ -1,7 +1,7 @@
 // src/pages/HomePage.js
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Truck, Shield, RefreshCw, Headphones, ShoppingCart, ArrowRight } from 'lucide-react';
+import { Truck, Shield, RefreshCw, Headphones, ArrowRight } from 'lucide-react';
 import { getProducts, getCategories } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import './HomePage.css';
@@ -16,9 +16,29 @@ export default function HomePage() {
 
   useEffect(() => {
     getCategories().then(r => setCategories(r.data)).catch(() => {});
-    getProducts({ sort: 'bestseller', limit: 10 }).then(r => setBestsellers(r.data.products)).catch(() => {});
-    getProducts({ tag: 'new', limit: 8 }).then(r => setNewArrivals(r.data.products)).catch(() => {});
-    getProducts({ tag: 'sale', limit: 4 }).then(r => setFlashSale(r.data.products)).catch(() => {});
+
+    // Bestseller: chỉ lấy 5 để vừa 1 hàng grid 5 cột
+    getProducts({ sort: 'bestseller', limit: 5 })
+      .then(r => setBestsellers(r.data.products))
+      .catch(() => {});
+
+    // Hàng mới về: lấy 4 sản phẩm mới nhất
+    getProducts({ sort: 'newest', limit: 4 })
+      .then(r => setNewArrivals(r.data.products))
+      .catch(() => {});
+
+    // Flash Sale: thử tag=sale trước, nếu rỗng thì fallback sang sản phẩm có discount (originalPrice > price)
+    getProducts({ tag: 'sale', limit: 4 })
+      .then(r => {
+        if (r.data.products && r.data.products.length > 0) {
+          setFlashSale(r.data.products);
+        } else {
+          // Fallback: lấy 4 sản phẩm bán chạy nhất làm flash sale
+          return getProducts({ sort: 'bestseller', limit: 4 })
+            .then(r2 => setFlashSale(r2.data.products || []));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Đồng hồ đếm ngược flash sale
@@ -61,7 +81,6 @@ export default function HomePage() {
         </div>
 
         <div className="hero-right">
-          {/* Nếu có banner ảnh thì hiện, không thì dùng placeholder */}
           <div className="hero-right-placeholder">👗</div>
           <div className="hero-bottom-info">
             <div className="hero-tag">MỚI VỀ MỖI NGÀY</div>
@@ -116,7 +135,7 @@ export default function HomePage() {
             {categories.map(cat => (
               <Link key={cat.id} to={`/products?category=${cat.slug}`} className="category-card">
                 <img
-                  src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${cat.image}`}
+                  src={`https://webquanao-pe7a.onrender.com${cat.image}`}
                   alt={cat.name}
                   className="category-img"
                   onError={e => { e.target.style.display = 'none'; }}
@@ -128,7 +147,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== FLASH SALE ===== */}
+      {/* ===== FLASH SALE — luôn hiện, fallback sang bestseller nếu ko có tag sale ===== */}
       {flashSale.length > 0 && (
         <section className="section section-bg-dark">
           <div className="container">
@@ -155,7 +174,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ===== BÁN CHẠY NHẤT ===== */}
+      {/* ===== BÁN CHẠY NHẤT — limit 5 để vừa 1 hàng ===== */}
       <section className="section section-bg-white">
         <div className="container">
           <div className="section-header">
