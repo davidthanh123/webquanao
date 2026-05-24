@@ -25,7 +25,7 @@ img { max-width: 100%; }
 
 .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
 
-/* Buttons */
+/* Buttons — dùng prefix .app- để tránh conflict */
 .btn-primary {
   background: var(--primary); color: white; border: none;
   padding: 10px 24px; border-radius: var(--radius); font-weight: 700;
@@ -46,29 +46,18 @@ img { max-width: 100%; }
 }
 .btn-ghost:hover { background: var(--bg); color: var(--text); }
 
-/* Cards */
-.card {
+/* Cards — chỉ dùng .app-card để tránh override product card */
+.app-card {
   background: white; border-radius: var(--radius);
   box-shadow: var(--shadow); overflow: hidden; transition: box-shadow 0.2s, transform 0.2s;
 }
-.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.app-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
 
-/* Badge */
-.badge {
-  display: inline-block; padding: 2px 8px; border-radius: 4px;
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-}
-.badge-red { background: var(--primary); color: white; }
-.badge-orange { background: var(--secondary); color: white; }
-.badge-green { background: var(--success); color: white; }
-
-/* Star Rating */
-.stars { color: #f5a623; font-size: 13px; }
-
-/* Price */
-.price-current { color: var(--primary); font-weight: 800; font-size: 16px; }
-.price-original { color: var(--text-light); text-decoration: line-through; font-size: 13px; }
-.price-discount { color: var(--primary); font-size: 12px; font-weight: 700; }
+/* 
+  QUAN TRỌNG: Xóa các class global .badge, .badge-red, .badge-orange, .badge-green,
+  .stars, .price-current, .price-original vì chúng conflict với ProductCard.css và HomePage.css.
+  Các class này đã được định nghĩa riêng trong từng component CSS.
+*/
 
 /* Forms */
 .form-group { margin-bottom: 16px; }
@@ -80,8 +69,11 @@ img { max-width: 100%; }
 }
 .form-input:focus { border-color: var(--primary); }
 
-/* Grid */
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+/*
+  QUAN TRỌNG: Xóa .product-grid global vì conflict với HomePage.css.
+  HomePage.css đã định nghĩa .product-grid { grid-template-columns: repeat(5,1fr) }.
+  Nếu để ở đây sẽ bị override thành auto-fill.
+*/
 
 /* Divider */
 .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
@@ -114,6 +106,5 @@ img { max-width: 100%; }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .container { padding: 0 12px; }
 }
