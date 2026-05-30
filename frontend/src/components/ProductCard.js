@@ -1,4 +1,5 @@
 // src/components/ProductCard.js
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -8,22 +9,55 @@ import './ProductCard.css';
 const formatPrice = (p) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
 
+const BASE_URL = 'https://webquanao-pe7a.onrender.com';
+
 function getImageUrl(img) {
-  if (!img) return 'https://placehold.co/300x400?text=No+Image';
+  if (!img) return null;
+  // Ảnh đã được cache về server (local path)
+  if (img.startsWith('/images/')) return `${BASE_URL}${img}`;
+  // Ảnh Shopee còn sót → dùng proxy
   if (img.includes('susercontent.com') || img.includes('shopee')) {
-    return `https://webquanao-pe7a.onrender.com/api/proxy-image?url=${encodeURIComponent(img)}`;
+    return `${BASE_URL}/api/proxy-image?url=${encodeURIComponent(img)}`;
   }
+  // URL tuyệt đối khác
   if (img.startsWith('http://') || img.startsWith('https://')) return img;
-  const base = 'https://webquanao-pe7a.onrender.com';
-  const path = img.startsWith('/images/') ? img : `/images/${img}`;
-  return `${base}${path}`;
+  return `${BASE_URL}/images/${img}`;
+}
+
+const PLACEHOLDER = 'https://placehold.co/300x400?text=No+Image';
+
+// Component ảnh có fallback thông minh: thử từng ảnh trong list trước khi dùng placeholder
+function ProductImage({ imageList, name }) {
+  const [idx, setIdx] = useState(0);
+
+  const src = getImageUrl(imageList[idx]) || PLACEHOLDER;
+
+  const handleError = () => {
+    if (idx + 1 < imageList.length) {
+      // Thử ảnh tiếp theo trong danh sách
+      setIdx(idx + 1);
+    } else {
+      // Hết ảnh → dùng placeholder, không retry nữa
+      setIdx(-1);
+    }
+  };
+
+  return (
+    <img
+      src={idx === -1 ? PLACEHOLDER : src}
+      alt={name}
+      className="product-card-img"
+      loading="lazy"
+      onError={idx === -1 ? undefined : handleError}
+    />
+  );
 }
 
 export default function ProductCard({ product, dark = false }) {
   const { addItem } = useCart();
   const { id, slug, name, price, originalPrice, images, rating, sold, tags } = product;
 
-  const imageList = Array.isArray(images) ? images : [];
+  const imageList = Array.isArray(images) ? images.filter(Boolean) : [];
   const tagList   = Array.isArray(tags)   ? tags   : [];
 
   const discount     = originalPrice > price ? Math.round((1 - price / originalPrice) * 100) : 0;
@@ -42,13 +76,7 @@ export default function ProductCard({ product, dark = false }) {
   return (
     <Link to={productLink} className={`product-card${dark ? ' dark' : ''}`}>
       <div className="product-card-img-wrapper">
-        <img
-          src={getImageUrl(imageList[0])}
-          alt={name}
-          className="product-card-img"
-          loading="lazy"
-          onError={e => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x400?text=No+Image'; }}
-        />
+        <ProductImage imageList={imageList} name={name} />
 
         {/* Badges */}
         <div className="product-badges">

@@ -69,21 +69,54 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/banners', bannerRoutes);
 
-// Proxy ảnh Shopee để tránh hotlink block
+// Proxy ảnh Shopee — có validation chống trả ảnh sai
 const https = require('https');
 const http = require('http');
+
 app.get('/api/proxy-image', (req, res) => {
   const imageUrl = req.query.url;
   if (!imageUrl) return res.status(400).send('Missing url');
-  
+
+  // Chỉ cho phép domain ảnh hợp lệ (chặn SSRF)
+  const allowedHosts = ['susercontent.com', 'shopee.vn', 'cf.shopee.vn', 'down-vn.img.susercontent.com'];
+  try {
+    const hostname = new URL(imageUrl).hostname;
+    const isAllowed = allowedHosts.some(h => hostname.endsWith(h));
+    if (!isAllowed) return res.status(403).send('Domain not allowed');
+  } catch {
+    return res.status(400).send('Invalid URL');
+  }
+
   const protocol = imageUrl.startsWith('https') ? https : http;
-  protocol.get(imageUrl, { 
-    headers: { 'Referer': 'https://shopee.vn', 'User-Agent': 'Mozilla/5.0' }
+  const request = protocol.get(imageUrl, {
+    headers: {
+      'Referer': 'https://shopee.vn',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    },
+    timeout: 10000,
   }, (imgRes) => {
-    res.setHeader('Content-Type', imgRes.headers['content-type'] || 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
+    // Follow redirect
+    if (imgRes.statusCode === 301 || imgRes.statusCode === 302) {
+      return res.redirect(imgRes.headers.location);
+    }
+    // ✅ Validate status
+    if (imgRes.statusCode !== 200) {
+      imgRes.resume();
+      return res.status(404).send('Image not found');
+    }
+    // ✅ Validate content-type phải là image/*
+    const contentType = imgRes.headers['content-type'] || '';
+    if (!contentType.startsWith('image/')) {
+      imgRes.resume();
+      return res.status(404).send('Not an image');
+    }
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=604800'); // cache 7 ngày
     imgRes.pipe(res);
-  }).on('error', () => res.status(404).send('Image not found'));
+  });
+
+  request.on('error', () => res.status(404).send('Image fetch failed'));
+  request.on('timeout', () => { request.destroy(); res.status(504).send('Timeout'); });
 });
 
 // Health check
